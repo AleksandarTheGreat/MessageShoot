@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="4dp"
+    android:orientation="vertical"
+    tools:context=".View.Fragments.FragmentHome">
+
+    <RelativeLayout
+        android:id="@+id/headerLayoutFragmentHome"
+        android:layout_height="?actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="4dp">
+
+        <ImageView
+            android:id="@+id/imageViewLogo"
+            android:layout_height="50dp"
+            android:layout_width="50dp"
+            android:src="@drawable/ic_logo_messageshoot"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginHorizontal="8dp"
+            />
+
+        <TextView
+            android:id="@+id/textViewTitleFragmentHome"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toEndOf="@id/imageViewLogo"
+            android:layout_centerVertical="true"
+            android:text="Chats"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginHorizontal="8dp"
+            app:cardCornerRadius="25dp">
+
+            <ImageView
+                android:id="@+id/imageViewProfile"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:src="@drawable/ic_profile"
+                android:scaleType="centerCrop"
+                />
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchViewFragmentHome"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/back_for_search_view"
+        app:queryBackground="@android:color/transparent"
+        app:iconifiedByDefault="false"
+        app:defaultQueryHint="Search for a user"
+        app:queryHint="Search for a user"
+        />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewFragmentHome"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</LinearLayout>
+
+
+
+
+
+
+
+
