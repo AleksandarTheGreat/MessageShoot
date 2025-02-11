@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -26,6 +27,7 @@ import com.finki.messageshoot.View.Activities.LoginActivity;
 import com.finki.messageshoot.View.Adapters.CustomAdapter;
 import com.finki.messageshoot.View.Interfaces.IEssentials;
 import com.finki.messageshoot.ViewModel.MyViewModel;
+import com.finki.messageshoot.databinding.ActivityMainBinding;
 import com.finki.messageshoot.databinding.FragmentHomeBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,6 +50,8 @@ public class FragmentHome extends Fragment implements IEssentials {
     private CustomAdapter customAdapter;
     private FirebaseAuth firebaseAuth;
 
+    private ActivityMainBinding activityMainBinding;
+
     public FragmentHome() {
         // Required empty public constructor
     }
@@ -55,8 +59,10 @@ public class FragmentHome extends Fragment implements IEssentials {
     public static FragmentHome newInstance(String param1, String param2) {
         FragmentHome fragment = new FragmentHome();
         Bundle args = new Bundle();
+
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -104,11 +110,12 @@ public class FragmentHome extends Fragment implements IEssentials {
                                     .load(user.getProfilePictureUrl())
                                     .into(binding.imageViewProfile);
                         }
+
                         break;
                     }
                 }
 
-                customAdapter = new CustomAdapter(getContext(), users);
+                customAdapter = new CustomAdapter(getContext(), activityMainBinding, (AppCompatActivity) getActivity(), users);
 
                 binding.recyclerViewFragmentHome.setLayoutManager(new LinearLayoutManager(getContext()));
                 binding.recyclerViewFragmentHome.setHasFixedSize(true);
@@ -169,10 +176,18 @@ public class FragmentHome extends Fragment implements IEssentials {
                     .setCancelable(true)
                     .show();
         });
+
+        binding.imageViewLogo.setOnClickListener(view -> {
+            activityMainBinding.drawerLayoutMainActivity.openDrawer(GravityCompat.START);
+        });
     }
 
     @Override
     public void additionalThemeChanges() {
 
+    }
+
+    public void setActivityMainBinding(ActivityMainBinding activityMainBinding){
+        this.activityMainBinding = activityMainBinding;
     }
 }

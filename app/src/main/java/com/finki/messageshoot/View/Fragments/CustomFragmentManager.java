@@ -12,11 +12,18 @@ import com.finki.messageshoot.databinding.ActivityMainBinding;
 public class CustomFragmentManager {
 
     @SuppressLint("CommitTransaction")
-    public static void changeFragment(AppCompatActivity appCompatActivity, ActivityMainBinding binding, Fragment fragment){
+    public static void changeFragment(AppCompatActivity appCompatActivity, ActivityMainBinding binding, Fragment fragment, boolean shouldPutOnStack){
         FragmentManager fragmentManager = appCompatActivity.getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
-                .commit();
+        if (shouldPutOnStack){
+            fragmentManager.beginTransaction()
+                    .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
+                    .addToBackStack("stack")
+                    .commit();
+        } else {
+            fragmentManager.beginTransaction()
+                    .replace(binding.fragmentContainerViewMainActivity.getId(), fragment)
+                    .commit();
+        }
     }
 
 }

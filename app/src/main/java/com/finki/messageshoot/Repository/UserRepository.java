@@ -45,8 +45,9 @@ public class UserRepository {
                             String nickname = (String) userMap.get("nickname");
                             String bio = (String) userMap.get("bio");
                             String profilePictureUrl = (String) userMap.get("profilePhotoUrl");
+                            String coverPictureUrl = (String) userMap.get("coverPhotoUrl");
 
-                            User user = new User(email, nickname, bio, profilePictureUrl);
+                            User user = new User(email, nickname, bio, profilePictureUrl, coverPictureUrl);
                             users.add(user);
                         }
 

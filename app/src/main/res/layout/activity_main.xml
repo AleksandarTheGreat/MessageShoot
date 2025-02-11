@@ -7,10 +7,26 @@
     android:layout_height="match_parent"
     tools:context=".View.Activities.MainActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerViewMainActivity"
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawerLayoutMainActivity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainerViewMainActivity"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationViewMainActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            app:menu="@menu/main_menu"
+            app:headerLayout="@layout/header_layout_for_menu"
+            />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
 
 </RelativeLayout>

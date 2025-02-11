@@ -9,12 +9,14 @@ public class User {
     private String nickname;
     private String bio;
     private String profilePictureUrl;
+    private String coverPictureUrl;
 
-    public User(String email, String nickname, String bio, String profilePictureUrl) {
+    public User(String email, String nickname, String bio, String profilePictureUrl, String coverPictureUrl) {
         this.email = email;
         this.nickname = nickname;
         this.bio = bio;
         this.profilePictureUrl = profilePictureUrl;
+        this.coverPictureUrl = coverPictureUrl;
     }
 
     @NonNull
@@ -60,5 +62,13 @@ public class User {
 
     public void setProfilePictureUrl(String profilePictureUrl) {
         this.profilePictureUrl = profilePictureUrl;
+    }
+
+    public String getCoverPictureUrl() {
+        return coverPictureUrl;
+    }
+
+    public void setCoverPictureUrl(String coverPictureUrl) {
+        this.coverPictureUrl = coverPictureUrl;
     }
 }

@@ -1,19 +1,26 @@
 package com.finki.messageshoot.View.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finki.messageshoot.Model.Helper.ThemeUtils;
 import com.finki.messageshoot.Model.User;
 import com.finki.messageshoot.R;
+import com.finki.messageshoot.View.Fragments.CustomFragmentManager;
+import com.finki.messageshoot.View.Fragments.FragmentChat;
+import com.finki.messageshoot.databinding.ActivityMainBinding;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -25,11 +32,15 @@ import kotlin.jvm.internal.Lambda;
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
 
     private Context context;
+    private ActivityMainBinding activityMainBinding;
+    private AppCompatActivity appCompatActivity;
     private List<User> users;
     private boolean isNightModeOn;
 
-    public CustomAdapter(Context context, List<User> users) {
+    public CustomAdapter(Context context, ActivityMainBinding activityMainBinding, AppCompatActivity appCompatActivity, List<User> users) {
         this.context = context;
+        this.activityMainBinding = activityMainBinding;
+        this.appCompatActivity = appCompatActivity;
         this.users = users;
         this.isNightModeOn = ThemeUtils.isNightModeOn(context);
     }
@@ -40,7 +51,15 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.single_user_layout, parent, false);
 
-        return new MyViewHolder(view);
+        MyViewHolder myViewHolder = new MyViewHolder(view);
+
+        myViewHolder.mainLinearLayout.setOnClickListener(v -> {
+//            FragmentChat fragmentChat = FragmentChat.newInstance();
+//            CustomFragmentManager.changeFragment(appCompatActivity, activityMainBinding, fragmentChat, true);
+            Toast.makeText(context, "Not now pal, not now", Toast.LENGTH_SHORT).show();
+        });
+
+        return myViewHolder;
     }
 
     @Override
@@ -65,6 +84,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     }
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
+        protected LinearLayout mainLinearLayout;
         protected TextView textViewEmail;
         protected TextView textViewNickname;
         protected TextView textViewBio;
@@ -72,6 +92,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.mainLinearLayout = itemView.findViewById(R.id.linearLayoutSingleUser);
             this.textViewEmail = itemView.findViewById(R.id.textViewEmail);
             this.textViewNickname = itemView.findViewById(R.id.textViewNickname);
             this.textViewBio = itemView.findViewById(R.id.textViewBio);
