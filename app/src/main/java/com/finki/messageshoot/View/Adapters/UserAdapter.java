@@ -1,6 +1,5 @@
 package com.finki.messageshoot.View.Adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,24 +11,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finki.messageshoot.Model.Helper.ThemeUtils;
 import com.finki.messageshoot.Model.User;
 import com.finki.messageshoot.R;
-import com.finki.messageshoot.View.Fragments.CustomFragmentManager;
-import com.finki.messageshoot.View.Fragments.FragmentChat;
 import com.finki.messageshoot.databinding.ActivityMainBinding;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
-import kotlin.jvm.internal.Lambda;
-
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> {
 
     private Context context;
     private ActivityMainBinding activityMainBinding;
@@ -37,7 +29,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     private List<User> users;
     private boolean isNightModeOn;
 
-    public CustomAdapter(Context context, ActivityMainBinding activityMainBinding, AppCompatActivity appCompatActivity, List<User> users) {
+    public UserAdapter(Context context, ActivityMainBinding activityMainBinding, AppCompatActivity appCompatActivity, List<User> users) {
         this.context = context;
         this.activityMainBinding = activityMainBinding;
         this.appCompatActivity = appCompatActivity;
@@ -47,7 +39,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
     @NonNull
     @Override
-    public CustomAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public UserAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.single_user_layout, parent, false);
 
@@ -63,7 +55,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CustomAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull UserAdapter.MyViewHolder holder, int position) {
         User user = users.get(position);
 
         holder.textViewEmail.setText(user.getEmail());

@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -24,9 +23,9 @@ import com.finki.messageshoot.Model.Helper.ThemeUtils;
 import com.finki.messageshoot.Model.User;
 import com.finki.messageshoot.R;
 import com.finki.messageshoot.View.Activities.LoginActivity;
-import com.finki.messageshoot.View.Adapters.CustomAdapter;
+import com.finki.messageshoot.View.Adapters.UserAdapter;
 import com.finki.messageshoot.View.Interfaces.IEssentials;
-import com.finki.messageshoot.ViewModel.MyViewModel;
+import com.finki.messageshoot.ViewModel.ViewModelUsers;
 import com.finki.messageshoot.databinding.ActivityMainBinding;
 import com.finki.messageshoot.databinding.FragmentHomeBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -34,7 +33,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -45,9 +43,9 @@ public class FragmentHome extends Fragment implements IEssentials {
     private String mParam1;
     private String mParam2;
     private FragmentHomeBinding binding;
-    private MyViewModel myViewModel;
+    private ViewModelUsers viewModelUsers;
     private boolean isNightModeOn;
-    private CustomAdapter customAdapter;
+    private UserAdapter customAdapter;
     private FirebaseAuth firebaseAuth;
 
     private ActivityMainBinding activityMainBinding;
@@ -90,32 +88,27 @@ public class FragmentHome extends Fragment implements IEssentials {
     @Override
     public void instantiateObjects() {
         isNightModeOn = ThemeUtils.isNightModeOn(getContext());
-        myViewModel = new ViewModelProvider(requireActivity()).get(MyViewModel.class);
+
+        viewModelUsers = new ViewModelProvider(requireActivity()).get(ViewModelUsers.class);
 
         firebaseAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public void addEventListeners() {
-        myViewModel.getMutableLiveDataUsers().observe(requireActivity(), new Observer<List<User>>() {
+        viewModelUsers.getMutableLiveDataCurrentUser().observe(requireActivity(), new Observer<User>() {
+            @Override
+            public void onChanged(User user) {
+                if (user.getProfilePictureUrl() == null || user.getProfilePictureUrl().isEmpty())
+                    binding.imageViewProfile.setImageResource(R.drawable.ic_profile);
+                else Picasso.get().load(user.getProfilePictureUrl()).into(binding.imageViewProfile);
+            }
+        });
+
+        viewModelUsers.getMutableLiveDataUsers().observe(requireActivity(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
-                String email = firebaseAuth.getCurrentUser().getEmail();
-                for (User user: users){
-                    if (user.getEmail().equals(email)){
-                        if (user.getProfilePictureUrl().isEmpty()){
-                            binding.imageViewProfile.setImageResource(R.drawable.ic_profile);
-                        } else {
-                            Picasso.get()
-                                    .load(user.getProfilePictureUrl())
-                                    .into(binding.imageViewProfile);
-                        }
-
-                        break;
-                    }
-                }
-
-                customAdapter = new CustomAdapter(getContext(), activityMainBinding, (AppCompatActivity) getActivity(), users);
+                customAdapter = new UserAdapter(getContext(), activityMainBinding, (AppCompatActivity) getActivity(), users);
 
                 binding.recyclerViewFragmentHome.setLayoutManager(new LinearLayoutManager(getContext()));
                 binding.recyclerViewFragmentHome.setHasFixedSize(true);
@@ -128,7 +121,7 @@ public class FragmentHome extends Fragment implements IEssentials {
         binding.swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                myViewModel.loadAllUsers();
+                viewModelUsers.loadAllUsers();
                 Log.d("Tag", "This is called?");
             }
         });
@@ -141,13 +134,13 @@ public class FragmentHome extends Fragment implements IEssentials {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                List<User> allUsers = myViewModel.getMutableLiveDataUsers().getValue();
+                List<User> allUsers = viewModelUsers.getMutableLiveDataUsers().getValue();
                 List<User> filteredUsers = allUsers
                         .stream()
                         .filter(user -> user.getEmail().contains(newText) || user.getNickname().contains(newText))
                         .collect(Collectors.toList());
 
-                myViewModel.getMutableLiveDataUsers().setValue(filteredUsers);
+                viewModelUsers.getMutableLiveDataUsers().setValue(filteredUsers);
                 return true;
             }
         });

@@ -8,11 +8,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.finki.messageshoot.R;
-import com.finki.messageshoot.Repository.AuthenticationRepository;
+import com.finki.messageshoot.Repository.Implementations.AuthenticationRepository;
 import com.finki.messageshoot.View.Interfaces.IEssentials;
 import com.finki.messageshoot.databinding.ActivityLoginBinding;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity implements IEssentials {
 

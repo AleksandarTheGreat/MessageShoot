@@ -1,13 +1,11 @@
-package com.finki.messageshoot.Repository;
+package com.finki.messageshoot.Repository.Implementations;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.PatternMatcher;
 import android.util.Log;
 import android.util.Patterns;
 import android.widget.Toast;
 
-import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 
 import com.finki.messageshoot.View.Activities.MainActivity;
@@ -16,9 +14,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.rpc.context.AttributeContext;
-
-import java.util.regex.Pattern;
 
 public class AuthenticationRepository {
 
