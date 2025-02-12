@@ -1,10 +1,12 @@
 package com.finki.messageshoot.Model;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.Nullable;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class TextPost {
@@ -31,14 +33,8 @@ public class TextPost {
         this.likesList = likesList;
     }
 
-    public TextPost(String email, String nickname, String profilePicUrl, String content, String postedAtString, List<String> likesList) {
-        this.email = email;
-        this.nickname = nickname;
-        this.profilePicUrl = profilePicUrl;
-        this.content = content;
-        this.postedAtString = postedAtString;
-        this.postedAt = parseDateTime(postedAtString);
-        this.likesList = likesList;
+    private TextPost() {
+
     }
 
     @Override
@@ -65,6 +61,26 @@ public class TextPost {
             return LocalDateTime.of(year, month, day, hour, minute, second);
         }
         return null;
+    }
+
+    @SuppressLint("NewApi")
+    public String goodLookingDateTimeFormat(){
+        @SuppressLint({"NewApi", "LocalSuppress"})
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy ' at ' HH:mm 'h'");
+        return this.postedAt.format(dateTimeFormatter);
+    }
+
+    public static TextPost createTextPostForSaving(long id, String email, String nickname, String profilePicUrl, String content, String postedAtString){
+        TextPost textPost = new TextPost();
+
+        textPost.setId(id);
+        textPost.setEmail(email);
+        textPost.setNickname(nickname);
+        textPost.setProfilePicUrl(profilePicUrl);
+        textPost.setContent(content);
+        textPost.setPostedAtString(postedAtString);
+
+        return textPost;
     }
 
     public String getEmail() {

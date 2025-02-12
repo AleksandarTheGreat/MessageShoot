@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/linearLayoutTextPost"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -10,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="8dp"
         >
 
         <androidx.cardview.widget.CardView
@@ -37,8 +36,10 @@
             android:id="@+id/textViewEmailTextPost"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="user.email@mail.com"
             android:layout_marginHorizontal="8dp"
+            android:text="user.email@mail.com"
+            android:textStyle="bold"
+            android:textColor="@color/white"
             app:layout_constraintLeft_toRightOf="@id/cardViewTextPost"
             app:layout_constraintTop_toTopOf="@id/cardViewTextPost"
             />
@@ -47,10 +48,24 @@
             android:id="@+id/textViewNicknameTextPost"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="user123"
             android:layout_marginHorizontal="8dp"
+            android:text="user123"
+            android:textStyle="bold"
+            android:textColor="@color/white"
             app:layout_constraintLeft_toRightOf="@id/cardViewTextPost"
             app:layout_constraintTop_toBottomOf="@id/textViewEmailTextPost"
+            />
+
+        <ImageView
+            android:id="@+id/imageViewDeleteTextPost"
+            android:layout_height="20dp"
+            android:layout_width="20dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_x"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -60,8 +75,9 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:text="Some random text post just to do some things here and there and check this out, how will it stay work and etc..."
+        android:textSize="18sp"
         android:paddingHorizontal="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="10dp"
         />
 
     <LinearLayout
@@ -69,24 +85,53 @@
         android:layout_width="match_parent"
         android:orientation="horizontal"
         android:paddingHorizontal="8dp"
-        android:layout_marginBottom="42dp">
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
 
         <ImageView
             android:id="@+id/imageViewLikeTextPost"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/ic_launcher"
-            android:layout_marginEnd="24dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_empty_heart"
+            android:layout_marginEnd="4dp"
+            />
+
+        <TextView
+            android:id="@+id/textViewLikesTextPost"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:textColor="@color/white"
+            android:text="0 likes"
             />
 
         <ImageView
             android:id="@+id/imageViewCommentTextPost"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/ic_empty_comment"
+            android:layout_marginEnd="4dp"
+            />
+
+        <TextView
+            android:id="@+id/textViewCommentsTextPost"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
             android:layout_marginEnd="24dp"
+            android:textColor="@color/white"
+            android:text="0 comments"
             />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewPostedAtTextPost"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="20.01.2025 at 13:30h"
+        android:textSize="12sp"
+        android:paddingHorizontal="8dp"
+        android:layout_marginBottom="24dp"
+        />
 
 </LinearLayout>
