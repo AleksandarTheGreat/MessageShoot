@@ -2,6 +2,8 @@ package com.finki.messageshoot.View.Adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +32,9 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import kotlin.jvm.internal.Lambda;
 
@@ -43,6 +47,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
     private ViewModelTextPost viewModelTextPost;
     private String currentEmail;
     private TextPostAdapter currentAdapter;
+    private Handler handler;
     public TextPostAdapter(Context context, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost){
         this.context = context;
         this.textPostList = textPostList;
@@ -51,6 +56,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         this.firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app/");
         this.currentEmail = firebaseAuth.getCurrentUser().getEmail();
         this.currentAdapter = this;
+        this.handler = new Handler(Looper.getMainLooper());
     }
 
     @NonNull
@@ -58,6 +64,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
     public TextPostAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.single_text_post, parent, false);
+
         return new MyViewHolder(view);
     }
 
@@ -106,6 +113,9 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     .setCancelable(true)
                     .show();
         });
+
+        // This is for the likes changed
+        addDatabaseValueChangedListeners(textPost, position);
     }
 
     @Override
@@ -136,5 +146,44 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             this.textViewComments = itemView.findViewById(R.id.textViewCommentsTextPost);
             this.imageViewLikes = itemView.findViewById(R.id.imageViewLikeTextPost);
         }
+    }
+
+    private void addDatabaseValueChangedListeners(TextPost textPost, int position){
+        new Thread(() -> {
+            String replacedEmail = textPost.getEmail().replace(".", ":::");
+            String path = replacedEmail + "/" + textPost.getId();
+            DatabaseReference databaseReference = firebaseDatabase.getReference(path);
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    // 1. Likes -> notifyItemChanged(pos)   check but I have laggs
+                    // 2. Deleted -> notifyItemRemoved(pos)
+                    // 3. Added -> notifyItemInserted(pos)
+
+                    long id = snapshot.child("id").getValue(Long.class);
+                    String content = snapshot.child("content").getValue(String.class);
+                    String email = snapshot.child("email").getValue(String.class);
+                    String nickname = snapshot.child("nickname").getValue(String.class);
+                    String postedAt = snapshot.child("postedAtString").getValue(String.class);
+                    String profilePicture = snapshot.child("profilePicUrl").getValue(String.class);
+
+                    List<String> listLikes = new ArrayList<>();
+                    for (DataSnapshot likesChild: snapshot.child("/listLikes").getChildren()){
+                        listLikes.add(likesChild.getValue(String.class));
+                    }
+
+                    TextPost tp = new TextPost(id, email, nickname, profilePicture, content, postedAt, listLikes);
+                    textPostList.set(position, tp);
+                    handler.post(() -> {
+                        notifyItemChanged(position);
+                    });
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.d("Tag", "Canceled: " + error.getMessage());
+                }
+            });
+        }).start();
     }
 }

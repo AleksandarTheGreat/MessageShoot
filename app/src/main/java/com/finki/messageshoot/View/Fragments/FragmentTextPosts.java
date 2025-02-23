@@ -93,9 +93,8 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
     @Override
     public void instantiateObjects() {
         viewModelUsers = new ViewModelProvider(requireActivity()).get(ViewModelUsers.class);
-
+        
         viewModelTextPost = new ViewModelProvider(requireActivity()).get(ViewModelTextPost.class);
-        viewModelTextPost.init(getContext(), requireActivity());
         viewModelTextPost.listAll();
 
         viewModelTextPost.getMutableLiveData().observe(requireActivity(), new Observer<List<TextPost>>() {
@@ -116,62 +115,31 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
 
     @Override
     public void addEventListeners() {
-//        binding.fabAddTextPost.setOnClickListener(view -> {
-//            addTextPost();
+        /**
+         * This is generic, works for any kind of data change, but it is too much, since reloads everything
+         * I need to update just the changed data, not reload everything...
+         * So now I will try to apply listeners for the children, not the whole DB.
+         */
+
+//        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app");
+//        DatabaseReference databaseReference = firebaseDatabase.getReference();
+//        databaseReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                viewModelTextPost.listAll();
+//                Toast.makeText(getContext(), "If this is called I swear..." , Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Log.d("Tag", error.getMessage());
+//            }
 //        });
-
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app");
-        DatabaseReference databaseReference = firebaseDatabase.getReference();
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                viewModelTextPost.listAll();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("Tag", error.getMessage());
-            }
-        });
-
     }
 
     @Override
     public void additionalThemeChanges() {
 
-    }
-
-    private void addTextPost() {
-        LinearLayout.LayoutParams layoutParamsInput = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsInput.setMargins(60, 0, 60, 0);
-
-        TextInputEditText textInputEditText = new TextInputEditText(getContext());
-        textInputEditText.setLayoutParams(layoutParamsInput);
-        textInputEditText.setHint("Share what's on your mind...");
-        textInputEditText.setTextSize(14);
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext());
-        builder.setTitle("Text post")
-                .setIcon(R.mipmap.ic_launcher)
-                .setMessage("Enter a text post")
-                .setView(textInputEditText)
-                .setPositiveButton("Share with us", (dialog, which) -> {
-                    String input = textInputEditText.getText().toString().trim();
-                    if (input.isEmpty()) {
-                        Toast.makeText(getContext(), "Please enter some input", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    User currentUser = viewModelUsers.getMutableLiveDataCurrentUser().getValue();
-                    if (currentUser == null) {
-                        Toast.makeText(getContext(), "Current user is not loaded", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    viewModelTextPost.add(currentUser.getEmail(), currentUser.getNickname(), currentUser.getProfilePictureUrl(), input);
-                })
-                .setCancelable(true)
-                .show();
     }
 
     public void setActivityMainBinding(ActivityMainBinding activityMainBinding) {

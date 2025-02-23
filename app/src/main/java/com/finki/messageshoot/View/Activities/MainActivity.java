@@ -27,6 +27,7 @@ import com.finki.messageshoot.View.Fragments.FragmentHome;
 import com.finki.messageshoot.View.Fragments.FragmentInput;
 import com.finki.messageshoot.View.Fragments.FragmentTextPosts;
 import com.finki.messageshoot.View.Interfaces.IEssentials;
+import com.finki.messageshoot.ViewModel.ViewModelTextPost;
 import com.finki.messageshoot.ViewModel.ViewModelUsers;
 import com.finki.messageshoot.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationBarView;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
 
     private ActivityMainBinding binding;
     private ViewModelUsers viewModelUsers;
+    private ViewModelTextPost viewModelTextPost;
     private FirebaseAuth firebaseAuth;
     private AppCompatActivity appCompatActivity;
     private Context context;
@@ -92,6 +94,9 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
         viewModelUsers.loadAllUsers();
         viewModelUsers.findCurrentUser();
 
+        viewModelTextPost = new ViewModelProvider(this).get(ViewModelTextPost.class);
+        viewModelTextPost.init(this, this);
+
         int paddingLeft = binding.navigationViewMainActivity.getPaddingLeft();
         int paddingRight = binding.navigationViewMainActivity.getPaddingRight();
         Log.d("Tag", "Padding left: " + paddingLeft);
@@ -115,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
         binding.floatingActionButtonMainActivity.setOnClickListener(view -> {
             FragmentInput fragmentInput = FragmentInput.newInstance("Aleks", "The great");
             fragmentInput.setActivityMainBinding(binding);
+            fragmentInput.setFragmentTextPosts(fragmentTextPosts);
 
             CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentInput, false);
         });

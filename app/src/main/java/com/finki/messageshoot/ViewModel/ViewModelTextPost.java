@@ -1,12 +1,14 @@
 package com.finki.messageshoot.ViewModel;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.finki.messageshoot.Model.TextPost;
+import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyAdded;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostsLoaded;
 import com.finki.messageshoot.Repository.Implementations.TextPostRepository;
 
@@ -29,8 +31,8 @@ public class ViewModelTextPost extends ViewModel {
         this.textPostRepository.listAll(textPostList -> mutableLiveData.setValue(textPostList));
     }
 
-    public void add(String email, String nickname, String url, String content) {
-        this.textPostRepository.add(email, nickname, url, content);
+    public void add(String email, String nickname, String url, String content, OnTextPostSuccessfullyAdded onTextPostSuccessfullyAdded) {
+        this.textPostRepository.add(email, nickname, url, content, onTextPostSuccessfullyAdded);
     }
 
     public void delete(TextPost textPost){
