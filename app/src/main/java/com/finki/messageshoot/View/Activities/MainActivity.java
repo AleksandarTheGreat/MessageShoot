@@ -24,10 +24,12 @@ import com.finki.messageshoot.Model.User;
 import com.finki.messageshoot.R;
 import com.finki.messageshoot.View.Fragments.CustomFragmentManager;
 import com.finki.messageshoot.View.Fragments.FragmentHome;
+import com.finki.messageshoot.View.Fragments.FragmentInput;
 import com.finki.messageshoot.View.Fragments.FragmentTextPosts;
 import com.finki.messageshoot.View.Interfaces.IEssentials;
 import com.finki.messageshoot.ViewModel.ViewModelUsers;
 import com.finki.messageshoot.databinding.ActivityMainBinding;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
@@ -41,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
     private FirebaseAuth firebaseAuth;
     private AppCompatActivity appCompatActivity;
     private Context context;
+    private FragmentHome fragmentHome;
+    private FragmentTextPosts fragmentTextPosts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
     }
@@ -76,8 +80,12 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
         appCompatActivity = this;
         context = this;
 
-        FragmentHome fragmentHome = FragmentHome.newInstance("Aleksandar", "Mitrevski");
+        fragmentHome = FragmentHome.newInstance("Aleksandar", "Mitrevski");
         fragmentHome.setActivityMainBinding(binding);
+
+        fragmentTextPosts = FragmentTextPosts.newInstance();
+        fragmentTextPosts.setActivityMainBinding(binding);
+
         CustomFragmentManager.changeFragment(this, binding, fragmentHome, false);
 
         viewModelUsers = new ViewModelProvider(this).get(ViewModelUsers.class);
@@ -92,72 +100,28 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
 
     @Override
     public void addEventListeners() {
-        // this is for the menu
-        viewModelUsers.getMutableLiveDataUsers().observe(this, new Observer<List<User>>() {
+        binding.navigationViewMainActivity.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public void onChanged(List<User> users) {
-                String email = firebaseAuth.getCurrentUser().getEmail();
-                updateMenuUserAttributes(email, users);
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() == R.id.menuItemChats){
+                    CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentHome, false);
+                } else if (item.getItemId() == R.id.menuItemPosts){
+                    CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentTextPosts, false);
+                }
+                return true;
             }
         });
 
-        binding.navigationViewMainActivity.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
+        binding.floatingActionButtonMainActivity.setOnClickListener(view -> {
+            FragmentInput fragmentInput = FragmentInput.newInstance("Aleks", "The great");
+            fragmentInput.setActivityMainBinding(binding);
 
-                if (itemId == R.id.menuItem2) {
-
-                    FragmentTextPosts fragmentTextPosts = FragmentTextPosts.newInstance();
-                    CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentTextPosts, true);
-
-                } else if (itemId == R.id.menuItem3) {
-                    Toast.makeText(MainActivity.this, "but if you pour water on a rock, nothing happens", Toast.LENGTH_SHORT).show();
-                } else if (itemId == R.id.menuItem4) {
-                    Toast.makeText(MainActivity.this, "but if you pour water on a rock time after time after time, nothing happens", Toast.LENGTH_SHORT).show();
-                } else if (itemId == R.id.menuItem5) {
-                    Toast.makeText(MainActivity.this, "Item 5", Toast.LENGTH_SHORT).show();
-                } else if (itemId == R.id.menuItem6) {
-                    Toast.makeText(MainActivity.this, "Item 6", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "I don't know what you clicked", Toast.LENGTH_SHORT).show();
-                }
-
-                binding.drawerLayoutMainActivity.closeDrawer(GravityCompat.START);
-                return false;
-            }
+            CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentInput, false);
         });
     }
 
     @Override
     public void additionalThemeChanges() {
 
-    }
-
-    private void updateMenuUserAttributes(String email, List<User> users){
-        for (User user : users) {
-            if (email.equals(user.getEmail())) {
-                ImageView imageViewCover = findViewById(R.id.imageViewCoverPhotoHeaderLayout);
-                TextView textViewNickname = findViewById(R.id.textViewNicknameHeaderLayout);
-                TextView textViewEmail = findViewById(R.id.textViewEmailHeaderLayout);
-                TextView textViewNicknameLabel = findViewById(R.id.textViewNicknameLabel);
-                TextView textViewEmailLabel = findViewById(R.id.textViewEmailLabel);
-
-                if (user.getCoverPictureUrl() == null || user.getCoverPictureUrl().isEmpty()) imageViewCover.setImageResource(R.mipmap.ic_launcher);
-                else Picasso.get().load(user.getCoverPictureUrl()).into(imageViewCover);
-
-                if (user.getNickname() != null && !user.getNickname().isEmpty()) textViewNickname.setText(user.getNickname());
-                else textViewNickname.setText("No nickname :(");
-
-                textViewEmail.setText(user.getEmail());
-
-                textViewEmail.setTextColor(ContextCompat.getColor(context, R.color.white));
-                textViewEmailLabel.setTextColor(ContextCompat.getColor(context, R.color.white));
-                textViewNickname.setTextColor(ContextCompat.getColor(context, R.color.white));
-                textViewNicknameLabel.setTextColor(ContextCompat.getColor(context, R.color.white));
-
-                break;
-            }
-        }
     }
 }

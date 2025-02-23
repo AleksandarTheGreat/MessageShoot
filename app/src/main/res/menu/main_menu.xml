@@ -2,39 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menuItem2"
-        android:title="Posts"
-        android:icon="@mipmap/ic_launcher"
+        android:id="@+id/menuItemChats"
+        android:title="Chats"
+        android:icon="@drawable/ic_chats"
         />
 
-    <item android:title="Others">
-
-        <menu>
-            <item
-                android:id="@+id/menuItem3"
-                android:title="Menu group 1"
-                android:icon="@mipmap/ic_launcher"
-                />
-
-            <item
-                android:id="@+id/menuItem4"
-                android:title="Item 2"
-                android:icon="@mipmap/ic_launcher"
-                />
-
-            <item
-                android:id="@+id/menuItem5"
-                android:title="3 Items"
-                android:icon="@mipmap/ic_launcher"
-                />
-
-            <item
-                android:id="@+id/menuItem6"
-                android:title="Something with 4"
-                android:icon="@mipmap/ic_launcher"
-                />
-        </menu>
-
-    </item>
+    <item
+        android:id="@+id/menuItemPosts"
+        android:title="Posts"
+        android:icon="@drawable/ic_posts"
+        />
 
 </menu>

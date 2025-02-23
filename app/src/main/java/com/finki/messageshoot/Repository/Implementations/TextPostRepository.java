@@ -51,9 +51,12 @@ public class TextPostRepository implements ITextPostRepository {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<TextPost> textPostList = new ArrayList<>();
 
+                // All emails
+                // first level of collections
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    // All emails
-                    // first level of collections
+
+                    // All posts per user
+                    // second level of collections
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
 
                         long id = ds.child("id").getValue(Long.class);

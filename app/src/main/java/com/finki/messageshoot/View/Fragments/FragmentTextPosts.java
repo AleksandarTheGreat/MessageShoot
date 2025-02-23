@@ -23,6 +23,7 @@ import com.finki.messageshoot.View.Adapters.TextPostAdapter;
 import com.finki.messageshoot.View.Interfaces.IEssentials;
 import com.finki.messageshoot.ViewModel.ViewModelTextPost;
 import com.finki.messageshoot.ViewModel.ViewModelUsers;
+import com.finki.messageshoot.databinding.ActivityMainBinding;
 import com.finki.messageshoot.databinding.FragmentTextPostsBinding;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -50,6 +51,7 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
     private static final String ARG_PARAM2 = "param2";
     private String mParam1;
     private String mParam2;
+    private ActivityMainBinding activityMainBinding;
     private FragmentTextPostsBinding binding;
     private ViewModelTextPost viewModelTextPost;
     private ViewModelUsers viewModelUsers;
@@ -114,9 +116,9 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
 
     @Override
     public void addEventListeners() {
-        binding.fabAddTextPost.setOnClickListener(view -> {
-            addTextPost();
-        });
+//        binding.fabAddTextPost.setOnClickListener(view -> {
+//            addTextPost();
+//        });
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app");
         DatabaseReference databaseReference = firebaseDatabase.getReference();
@@ -170,5 +172,9 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
                 })
                 .setCancelable(true)
                 .show();
+    }
+
+    public void setActivityMainBinding(ActivityMainBinding activityMainBinding) {
+        this.activityMainBinding = activityMainBinding;
     }
 }

@@ -2,6 +2,7 @@ package com.finki.messageshoot.View.Adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +16,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.finki.messageshoot.Model.TextPost;
 import com.finki.messageshoot.R;
 import com.finki.messageshoot.ViewModel.ViewModelTextPost;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.dialog.MaterialDialogs;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -36,6 +42,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
     private List<TextPost> textPostList;
     private ViewModelTextPost viewModelTextPost;
     private String currentEmail;
+    private TextPostAdapter currentAdapter;
     public TextPostAdapter(Context context, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost){
         this.context = context;
         this.textPostList = textPostList;
@@ -43,6 +50,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app/");
         this.currentEmail = firebaseAuth.getCurrentUser().getEmail();
+        this.currentAdapter = this;
     }
 
     @NonNull
@@ -92,6 +100,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
             builder.setTitle("DELETE?")
                     .setMessage("Are you sure you want to delete this post?")
+                    .setIcon(R.drawable.ic_x)
                     .setPositiveButton("Yes", (dialog, which) -> viewModelTextPost.delete(textPost))
                     .setNegativeButton("Cancel", ((dialog, which) -> dialog.dismiss()))
                     .setCancelable(true)

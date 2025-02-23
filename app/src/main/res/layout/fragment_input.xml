@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="4dp"
+    android:orientation="vertical"
+    tools:context=".View.Fragments.FragmentInput">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        >
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewTextPost"
+            android:layout_height="40dp"
+            android:layout_width="40dp"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:id="@+id/imageViewProfileFragmentInput"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="centerCrop"
+                />
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/textViewEmailFragmentInput"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:text="user.email@mail.com"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            app:layout_constraintLeft_toRightOf="@id/cardViewTextPost"
+            app:layout_constraintTop_toTopOf="@id/cardViewTextPost"
+            />
+
+        <TextView
+            android:id="@+id/textViewNicknameFragmentInput"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:text="Nickname"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            app:layout_constraintLeft_toRightOf="@id/cardViewTextPost"
+            app:layout_constraintTop_toBottomOf="@id/textViewEmailFragmentInput"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="8dp"
+        android:text="What's on your mind?"
+        android:textSize="20sp"
+        />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="12dp"
+        android:text="Share your recent story..."
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_height="300dp"
+        android:layout_width="match_parent"
+        android:hint="Today I found out that...."
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="12dp"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textInputEditTextShareFragmentInput"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="14sp"
+            android:gravity="top|start"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/buttonShareFragmentInput"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="8dp"
+        android:drawableRight="@drawable/ic_share"
+        android:text="Share your thoughts"
+        />
+
+    <Button
+        android:id="@+id/buttonCancelFragmentInput"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginBottom="8dp"
+        android:drawableRight="@drawable/ic_cancel"
+        android:text="Clear your thoughts"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        />
+
+</LinearLayout>
+
+
+
+
+
+

@@ -5,28 +5,38 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".View.Activities.MainActivity">
 
-    <androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/drawerLayoutMainActivity"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerViewMainActivity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        />
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainerViewMainActivity"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/navigationViewMainActivity"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
-
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/navigationViewMainActivity"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
             app:menu="@menu/main_menu"
-            app:headerLayout="@layout/header_layout_for_menu"
             />
 
-    </androidx.drawerlayout.widget.DrawerLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingActionButtonMainActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_plus"
+            android:background="@drawable/back_for_fab"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

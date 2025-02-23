@@ -169,10 +169,6 @@ public class FragmentHome extends Fragment implements IEssentials {
                     .setCancelable(true)
                     .show();
         });
-
-        binding.imageViewLogo.setOnClickListener(view -> {
-            activityMainBinding.drawerLayoutMainActivity.openDrawer(GravityCompat.START);
-        });
     }
 
     @Override
