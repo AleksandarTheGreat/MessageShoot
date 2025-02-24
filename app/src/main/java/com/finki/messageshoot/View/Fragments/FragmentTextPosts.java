@@ -93,7 +93,7 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
     @Override
     public void instantiateObjects() {
         viewModelUsers = new ViewModelProvider(requireActivity()).get(ViewModelUsers.class);
-        
+
         viewModelTextPost = new ViewModelProvider(requireActivity()).get(ViewModelTextPost.class);
         viewModelTextPost.listAll();
 

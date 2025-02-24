@@ -156,16 +156,14 @@ public class TextPostRepository implements ITextPostRepository {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        String idd = textPost.getId() + "";
-        String path = textPost.getEmail() + "/" + idd;
-        path = path.replace(".", ":::");
+        String path = textPost.endpointPath();
 
         DatabaseReference databaseReference = firebaseDatabase.getReference(path);
         databaseReference.removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Log.d("Tag", "Successfully deleted post with id" + idd);
+                        Log.d("Tag", "Successfully deleted post with id" + textPost.getId());
                         progressDialog.dismiss();
                     }
                 })

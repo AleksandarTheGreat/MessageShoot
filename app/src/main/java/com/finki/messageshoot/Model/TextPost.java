@@ -43,7 +43,14 @@ public class TextPost {
             return false;
         else if (getClass() != obj.getClass())
             return false;
-        return id == ((TextPost) obj).id;
+        return id == ((TextPost) obj).id && email.equals(((TextPost) obj).email) && nickname.equals(((TextPost) obj).nickname)
+                && profilePicUrl.equals(((TextPost) obj).profilePicUrl) && content.equals(((TextPost) obj).content)
+                && postedAtString.equals(((TextPost) obj).postedAtString) && likesList.equals(((TextPost) obj).likesList);
+    }
+
+    public String endpointPath(){
+        String replacedEmail = email.replace(".", ":::");
+        return replacedEmail + "/" + id;
     }
 
     private LocalDateTime parseDateTime(String postedAtString){
@@ -81,6 +88,10 @@ public class TextPost {
         textPost.setPostedAtString(postedAtString);
 
         return textPost;
+    }
+
+    public int likesCount(){
+        return likesList.size();
     }
 
     public String getEmail() {

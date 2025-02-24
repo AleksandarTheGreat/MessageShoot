@@ -1,5 +1,6 @@
 package com.finki.messageshoot.View.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
@@ -48,7 +49,8 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
     private String currentEmail;
     private TextPostAdapter currentAdapter;
     private Handler handler;
-    public TextPostAdapter(Context context, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost){
+
+    public TextPostAdapter(Context context, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost) {
         this.context = context;
         this.textPostList = textPostList;
         this.viewModelTextPost = viewModelTextPost;
@@ -68,60 +70,31 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         return new MyViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull TextPostAdapter.MyViewHolder holder, int position) {
         TextPost textPost = textPostList.get(position);
-        String textPostEmail = textPost.getEmail();
 
-        holder.textViewEmail.setText(textPost.getEmail());
-        holder.textViewNickname.setText(textPost.getNickname());
-        holder.textViewContent.setText(textPost.getContent());
-        holder.textViewPostedAt.setText(textPost.goodLookingDateTimeFormat());
-        Picasso.get().load(textPost.getProfilePicUrl()).into(holder.imageViewProfilePic);
+        setUpTheUiViewHolder(holder, textPost);
+        setUpBasicEventListeners(holder, textPost);
 
-        if (textPostEmail.equals(currentEmail)) holder.imageViewDelete.setVisibility(View.VISIBLE);
-        else holder.imageViewDelete.setVisibility(View.GONE);
-
-        if (textPost.getLikesList().contains(currentEmail)) holder.imageViewLikes.setImageResource(R.drawable.ic_full_heart);
-        else holder.imageViewLikes.setImageResource(R.drawable.ic_empty_heart);
-
-        holder.textViewLikes.setText(textPost.getLikesList().size() + " likes");
-        holder.imageViewLikes.setOnClickListener(view -> {
-            String replacedEmail = textPostEmail.replace(".", ":::");
-            String path = replacedEmail + "/" + textPost.getId() + "/listLikes/";
-
-            if (!textPost.getLikesList().contains(currentEmail)){
-                textPost.getLikesList().add(currentEmail);
-                holder.imageViewLikes.setImageResource(R.drawable.ic_full_heart);
-
-            } else {
-                textPost.getLikesList().remove(currentEmail);
-                holder.imageViewLikes.setImageResource(R.drawable.ic_empty_heart);
-            }
-
-            DatabaseReference databaseReference = firebaseDatabase.getReference(path);
-            databaseReference.setValue(textPost.getLikesList());
-        });
-
-        holder.imageViewDelete.setOnClickListener(view -> {
-            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-            builder.setTitle("DELETE?")
-                    .setMessage("Are you sure you want to delete this post?")
-                    .setIcon(R.drawable.ic_x)
-                    .setPositiveButton("Yes", (dialog, which) -> viewModelTextPost.delete(textPost))
-                    .setNegativeButton("Cancel", ((dialog, which) -> dialog.dismiss()))
-                    .setCancelable(true)
-                    .show();
-        });
-
-        // This is for the likes changed
-        addDatabaseValueChangedListeners(textPost, position);
+        holder.createValueEventListener(firebaseDatabase, currentAdapter, textPostList, textPost, position, handler);
     }
 
     @Override
     public int getItemCount() {
         return textPostList.size();
     }
+
+
+    @Override
+    public void onViewRecycled(@NonNull MyViewHolder holder) {
+        super.onViewRecycled(holder);
+
+        TextPost textPost = textPostList.get(holder.getAdapterPosition());
+        holder.removeValueEventListener(firebaseDatabase, textPost);
+    }
+
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
         protected ImageView imageViewDelete;
@@ -133,6 +106,8 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         protected TextView textViewLikes;
         protected TextView textViewComments;
         protected ImageView imageViewLikes;
+        protected ValueEventListener valueEventListener;
+
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -146,19 +121,21 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             this.textViewComments = itemView.findViewById(R.id.textViewCommentsTextPost);
             this.imageViewLikes = itemView.findViewById(R.id.imageViewLikeTextPost);
         }
-    }
 
-    private void addDatabaseValueChangedListeners(TextPost textPost, int position){
-        new Thread(() -> {
-            String replacedEmail = textPost.getEmail().replace(".", ":::");
-            String path = replacedEmail + "/" + textPost.getId();
+        public void createValueEventListener(FirebaseDatabase firebaseDatabase,
+                                             TextPostAdapter textPostAdapter,
+                                             List<TextPost> textPostList,
+                                             TextPost textPost,
+                                             int position,
+                                             Handler handler) {
+
+            String path = textPost.endpointPath();
             DatabaseReference databaseReference = firebaseDatabase.getReference(path);
-            databaseReference.addValueEventListener(new ValueEventListener() {
+            valueEventListener = new ValueEventListener() {
+                @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    // 1. Likes -> notifyItemChanged(pos)   check but I have laggs
-                    // 2. Deleted -> notifyItemRemoved(pos)
-                    // 3. Added -> notifyItemInserted(pos)
+                    if (!snapshot.exists()) return;
 
                     long id = snapshot.child("id").getValue(Long.class);
                     String content = snapshot.child("content").getValue(String.class);
@@ -168,22 +145,93 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     String profilePicture = snapshot.child("profilePicUrl").getValue(String.class);
 
                     List<String> listLikes = new ArrayList<>();
-                    for (DataSnapshot likesChild: snapshot.child("/listLikes").getChildren()){
+                    for (DataSnapshot likesChild : snapshot.child("/listLikes").getChildren()) {
                         listLikes.add(likesChild.getValue(String.class));
                     }
 
                     TextPost tp = new TextPost(id, email, nickname, profilePicture, content, postedAt, listLikes);
-                    textPostList.set(position, tp);
-                    handler.post(() -> {
-                        notifyItemChanged(position);
-                    });
+                    TextPost currentTp = textPostList.get(position);
+
+                    if (!tp.equals(currentTp)) {
+                        textPostList.set(position, tp);
+                        handler.post(() -> {
+                            textPostAdapter.notifyItemChanged(position);
+                        });
+                        Log.d("Tag", "This is called when changes happen ??");
+                    } else {
+                        Log.d("Tag", "Why is this called?");
+                    }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     Log.d("Tag", "Canceled: " + error.getMessage());
                 }
-            });
-        }).start();
+            };
+
+            databaseReference.addValueEventListener(valueEventListener);
+            Log.d("Tag", "Listener added");
+        }
+
+        public void removeValueEventListener(FirebaseDatabase firebaseDatabase, TextPost textPost) {
+            String path = textPost.endpointPath();
+
+            DatabaseReference databaseReference = firebaseDatabase.getReference(path);
+            databaseReference.removeEventListener(valueEventListener);
+
+            Log.d("Tag", "Listener removed");
+        }
+    }
+
+    private void setUpTheUiViewHolder(MyViewHolder holder, TextPost textPost){
+        holder.textViewEmail.setText(textPost.getEmail());
+        holder.textViewNickname.setText(textPost.getNickname());
+        holder.textViewContent.setText(textPost.getContent());
+        holder.textViewPostedAt.setText(textPost.goodLookingDateTimeFormat());
+        holder.textViewLikes.setText(textPost.likesCount() + " likes");
+        Picasso.get().load(textPost.getProfilePicUrl()).into(holder.imageViewProfilePic);
+
+        if (textPost.getEmail().equals(currentEmail)) holder.imageViewDelete.setVisibility(View.VISIBLE);
+        else holder.imageViewDelete.setVisibility(View.GONE);
+
+        if (textPost.getLikesList().contains(currentEmail)) holder.imageViewLikes.setImageResource(R.drawable.ic_full_heart);
+        else holder.imageViewLikes.setImageResource(R.drawable.ic_empty_heart);
+
+    }
+
+    private void setUpBasicEventListeners(MyViewHolder holder, TextPost textPost){
+        holder.imageViewLikes.setOnClickListener(view -> {
+            String pathToLikes = textPost.endpointPath() + "/listLikes/";
+
+            // SO I can have changes in the listener, I am not updating the current textPost likes list...
+            // If I do no changes will be done in the listener, that is why I create a whole different new list.
+            // To update the changes at the db endpoint but not locally.
+            // Since the listener will update them locally at every device.
+
+            List<String> newLikedList = new ArrayList<>(textPost.getLikesList());
+
+            if (!textPost.getLikesList().contains(currentEmail)) {
+                newLikedList.add(currentEmail);
+                holder.imageViewLikes.setImageResource(R.drawable.ic_full_heart);
+
+            } else {
+                newLikedList.remove(currentEmail);
+                holder.imageViewLikes.setImageResource(R.drawable.ic_empty_heart);
+            }
+
+            DatabaseReference databaseReference = firebaseDatabase.getReference(pathToLikes);
+            databaseReference.setValue(newLikedList);
+        });
+
+        holder.imageViewDelete.setOnClickListener(view -> {
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+            builder.setTitle("DELETE?")
+                    .setMessage("Are you sure you want to delete this post?")
+                    .setIcon(R.drawable.ic_x)
+                    .setPositiveButton("Yes", (dialog, which) -> viewModelTextPost.delete(textPost))
+                    .setNegativeButton("Cancel", ((dialog, which) -> dialog.dismiss()))
+                    .setCancelable(true)
+                    .show();
+        });
     }
 }
