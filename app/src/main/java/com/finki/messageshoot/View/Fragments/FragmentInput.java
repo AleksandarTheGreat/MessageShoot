@@ -106,6 +106,8 @@ public class FragmentInput extends Fragment implements IEssentials {
                 public void onAdded(boolean success) {
                     if (success){
                         Toast.makeText(getContext(), "Shared successfully", Toast.LENGTH_SHORT).show();
+                        binding.textInputEditTextShareFragmentInput.setText("");
+
                         CustomFragmentManager.changeFragment((AppCompatActivity) requireActivity(), activityMainBinding, fragmentTextPosts, false);
                     } else {
                         Toast.makeText(getContext(), "Failed to share", Toast.LENGTH_SHORT).show();

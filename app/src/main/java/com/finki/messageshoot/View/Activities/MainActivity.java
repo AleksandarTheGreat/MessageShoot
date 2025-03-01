@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
     private Context context;
     private FragmentHome fragmentHome;
     private FragmentTextPosts fragmentTextPosts;
+    private FragmentInput fragmentInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +83,17 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
         appCompatActivity = this;
         context = this;
 
+
         fragmentHome = FragmentHome.newInstance("Aleksandar", "Mitrevski");
         fragmentHome.setActivityMainBinding(binding);
 
         fragmentTextPosts = FragmentTextPosts.newInstance();
         fragmentTextPosts.setActivityMainBinding(binding);
+
+        fragmentInput = FragmentInput.newInstance("Aleks", "The great");
+        fragmentInput.setActivityMainBinding(binding);
+        fragmentInput.setFragmentTextPosts(fragmentTextPosts);
+
 
         CustomFragmentManager.changeFragment(this, binding, fragmentHome, false);
 
@@ -96,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
 
         viewModelTextPost = new ViewModelProvider(this).get(ViewModelTextPost.class);
         viewModelTextPost.init(this, this);
+        // I can list all textPosts here instead of FragmentTextPosts
+        // But this also contradicts always loading new text posts
 
         int paddingLeft = binding.navigationViewMainActivity.getPaddingLeft();
         int paddingRight = binding.navigationViewMainActivity.getPaddingRight();
@@ -118,10 +127,6 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
         });
 
         binding.floatingActionButtonMainActivity.setOnClickListener(view -> {
-            FragmentInput fragmentInput = FragmentInput.newInstance("Aleks", "The great");
-            fragmentInput.setActivityMainBinding(binding);
-            fragmentInput.setFragmentTextPosts(fragmentTextPosts);
-
             CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentInput, false);
         });
     }

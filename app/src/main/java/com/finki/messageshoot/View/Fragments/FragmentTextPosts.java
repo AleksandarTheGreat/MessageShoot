@@ -119,6 +119,9 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
          * This is generic, works for any kind of data change, but it is too much, since reloads everything
          * I need to update just the changed data, not reload everything...
          * So now I will try to apply listeners for the children, not the whole DB.
+         *
+         *
+         * It seems successful, but I still need to do stuff
          */
 
 //        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app");

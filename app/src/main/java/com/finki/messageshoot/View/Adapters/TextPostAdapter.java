@@ -49,13 +49,14 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
     private String currentEmail;
     private TextPostAdapter currentAdapter;
     private Handler handler;
+    private static final String FIREBASE_DATABASE_URL = "https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app/";
 
     public TextPostAdapter(Context context, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost) {
         this.context = context;
         this.textPostList = textPostList;
         this.viewModelTextPost = viewModelTextPost;
         this.firebaseAuth = FirebaseAuth.getInstance();
-        this.firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app/");
+        this.firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_DATABASE_URL);
         this.currentEmail = firebaseAuth.getCurrentUser().getEmail();
         this.currentAdapter = this;
         this.handler = new Handler(Looper.getMainLooper());
@@ -135,7 +136,13 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (!snapshot.exists()) return;
+                    // remove from the adapter list
+                    // remove from the UI aka viewHolder
+                    if (!snapshot.exists()) {
+                        textPostList.remove(position);
+                        textPostAdapter.notifyItemRemoved(position);
+                        return;
+                    }
 
                     long id = snapshot.child("id").getValue(Long.class);
                     String content = snapshot.child("content").getValue(String.class);
@@ -161,6 +168,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     } else {
                         Log.d("Tag", "Why is this called?");
                     }
+
                 }
 
                 @Override
@@ -183,7 +191,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         }
     }
 
-    private void setUpTheUiViewHolder(MyViewHolder holder, TextPost textPost){
+    private void setUpTheUiViewHolder(MyViewHolder holder, TextPost textPost) {
         holder.textViewEmail.setText(textPost.getEmail());
         holder.textViewNickname.setText(textPost.getNickname());
         holder.textViewContent.setText(textPost.getContent());
@@ -191,15 +199,17 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         holder.textViewLikes.setText(textPost.likesCount() + " likes");
         Picasso.get().load(textPost.getProfilePicUrl()).into(holder.imageViewProfilePic);
 
-        if (textPost.getEmail().equals(currentEmail)) holder.imageViewDelete.setVisibility(View.VISIBLE);
+        if (textPost.getEmail().equals(currentEmail))
+            holder.imageViewDelete.setVisibility(View.VISIBLE);
         else holder.imageViewDelete.setVisibility(View.GONE);
 
-        if (textPost.getLikesList().contains(currentEmail)) holder.imageViewLikes.setImageResource(R.drawable.ic_full_heart);
+        if (textPost.getLikesList().contains(currentEmail))
+            holder.imageViewLikes.setImageResource(R.drawable.ic_full_heart);
         else holder.imageViewLikes.setImageResource(R.drawable.ic_empty_heart);
 
     }
 
-    private void setUpBasicEventListeners(MyViewHolder holder, TextPost textPost){
+    private void setUpBasicEventListeners(MyViewHolder holder, TextPost textPost) {
         holder.imageViewLikes.setOnClickListener(view -> {
             String pathToLikes = textPost.endpointPath() + "/listLikes/";
 
