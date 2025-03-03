@@ -94,8 +94,11 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
     public void onViewRecycled(@NonNull MyViewHolder holder) {
         super.onViewRecycled(holder);
 
-        TextPost textPost = textPostList.get(holder.getAdapterPosition());
-        holder.removeValueEventListener(firebaseDatabase, textPost);
+        int position = holder.getAdapterPosition();
+        if (position != -1){
+            TextPost textPost = textPostList.get(position);
+            holder.removeValueEventListener(firebaseDatabase, textPost);
+        }
     }
 
 
@@ -142,7 +145,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     // remove from the UI aka viewHolder
                     if (!snapshot.exists()) {
                         textPostList.remove(position);
-                        textPostAdapter.notifyItemRemoved(position);
+                        textPostAdapter.notifyDataSetChanged();
                         return;
                     }
 
