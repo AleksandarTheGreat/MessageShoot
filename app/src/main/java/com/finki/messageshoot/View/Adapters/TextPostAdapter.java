@@ -55,9 +55,11 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         this.context = context;
         this.textPostList = textPostList;
         this.viewModelTextPost = viewModelTextPost;
+
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_DATABASE_URL);
         this.currentEmail = firebaseAuth.getCurrentUser().getEmail();
+
         this.currentAdapter = this;
         this.handler = new Handler(Looper.getMainLooper());
     }
@@ -164,9 +166,9 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                         handler.post(() -> {
                             textPostAdapter.notifyItemChanged(position);
                         });
-                        Log.d("Tag", "This is called when changes happen ??");
+                        Log.d("Tag", "Changes have happened");
                     } else {
-                        Log.d("Tag", "Why is this called?");
+                        Log.d("Tag", "Nothing new has happened");
                     }
 
                 }
@@ -245,3 +247,4 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         });
     }
 }
+ 

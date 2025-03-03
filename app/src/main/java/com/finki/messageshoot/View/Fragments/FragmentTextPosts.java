@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -109,6 +110,8 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
                 binding.recyclerViewTextPosts.setLayoutManager(new LinearLayoutManager(getContext()));
                 binding.recyclerViewTextPosts.setHasFixedSize(true);
                 binding.recyclerViewTextPosts.setAdapter(textPostAdapter);
+
+                binding.swipeRefreshLayoutFragmentTextPosts.setRefreshing(false);
             }
         });
     }
@@ -138,6 +141,13 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
 //                Log.d("Tag", error.getMessage());
 //            }
 //        });
+
+        binding.swipeRefreshLayoutFragmentTextPosts.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                viewModelTextPost.listAll();
+            }
+        });
     }
 
     @Override
