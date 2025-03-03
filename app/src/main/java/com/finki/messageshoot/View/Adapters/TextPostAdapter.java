@@ -146,6 +146,10 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     if (!snapshot.exists()) {
                         textPostList.remove(position);
                         textPostAdapter.notifyDataSetChanged();
+
+                        // Maybe remove the valueEventListener here somehow,
+                        // when the textPost and view are deleted.
+
                         return;
                     }
 
