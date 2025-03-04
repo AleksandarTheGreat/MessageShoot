@@ -1,6 +1,7 @@
 package com.finki.messageshoot.View.Adapters;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.finki.messageshoot.Model.Comment;
 import com.finki.messageshoot.Model.TextPost;
 import com.finki.messageshoot.R;
+import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyDeleted;
 import com.finki.messageshoot.ViewModel.ViewModelTextPost;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -249,7 +252,23 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             builder.setTitle("DELETE?")
                     .setMessage("Are you sure you want to delete this post?")
                     .setIcon(R.drawable.ic_x)
-                    .setPositiveButton("Yes", (dialog, which) -> viewModelTextPost.delete(textPost))
+                    .setPositiveButton("Yes", (dialog, which) -> {
+
+                        ProgressDialog progressDialog = new ProgressDialog(context, R.style.CustomProgressDialogTheme);
+                        progressDialog.setTitle("Deleting...");
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+
+                        viewModelTextPost.delete(textPost, new OnTextPostSuccessfullyDeleted() {
+                            @Override
+                            public void onDeleted(boolean success) {
+                                if (success) Toast.makeText(context, "Successfully deleted textPost", Toast.LENGTH_SHORT).show();
+                                else Toast.makeText(context, "Failed to delete textPost", Toast.LENGTH_SHORT).show();
+
+                                progressDialog.dismiss();
+                            }
+                        });
+                    })
                     .setNegativeButton("Cancel", ((dialog, which) -> dialog.dismiss()))
                     .setCancelable(true)
                     .show();

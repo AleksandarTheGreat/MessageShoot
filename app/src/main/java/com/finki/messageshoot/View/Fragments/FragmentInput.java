@@ -1,5 +1,6 @@
 package com.finki.messageshoot.View.Fragments;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,31 +91,7 @@ public class FragmentInput extends Fragment implements IEssentials {
     @Override
     public void addEventListeners() {
         binding.buttonShareFragmentInput.setOnClickListener(view -> {
-            String content = binding.textInputEditTextShareFragmentInput.getText().toString().trim();
-            if (content.isEmpty()){
-                Toast.makeText(getContext(), "Please enter something", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            User user = viewModelUsers.getMutableLiveDataCurrentUser().getValue();
-            if (user == null){
-                Toast.makeText(getContext(), "Somehow user is null??", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            viewModelTextPost.add(user.getEmail(), user.getNickname(), user.getProfilePictureUrl(), content, new OnTextPostSuccessfullyAdded() {
-                @Override
-                public void onAdded(boolean success) {
-                    if (success){
-                        Toast.makeText(getContext(), "Shared successfully", Toast.LENGTH_SHORT).show();
-                        binding.textInputEditTextShareFragmentInput.setText("");
-
-                        CustomFragmentManager.changeFragment((AppCompatActivity) requireActivity(), activityMainBinding, fragmentTextPosts, false);
-                    } else {
-                        Toast.makeText(getContext(), "Failed to share", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+            addNewTextPost();
         });
 
         binding.buttonCancelFragmentInput.setOnClickListener(view -> {
@@ -132,5 +110,41 @@ public class FragmentInput extends Fragment implements IEssentials {
 
     public void setFragmentTextPosts(FragmentTextPosts fragmentTextPosts) {
         this.fragmentTextPosts = fragmentTextPosts;
+    }
+
+    private void addNewTextPost(){
+        String content = binding.textInputEditTextShareFragmentInput.getText().toString().trim();
+        if (content.isEmpty()){
+            binding.textInputLayoutFragmentInput.setError("Please enter something");
+            return;
+        }
+
+        binding.textInputLayoutFragmentInput.setError("");
+        User user = viewModelUsers.getMutableLiveDataCurrentUser().getValue();
+        if (user == null){
+            Toast.makeText(getContext(), "Somehow user is null??", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ProgressDialog progressDialog = new ProgressDialog(getContext(), R.style.CustomProgressDialogTheme);
+        progressDialog.setTitle("Adding...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        viewModelTextPost.add(user.getEmail(), user.getNickname(), user.getProfilePictureUrl(), content, new OnTextPostSuccessfullyAdded() {
+            @Override
+            public void onAdded(boolean success) {
+                if (success){
+                    Toast.makeText(getContext(), "Shared successfully", Toast.LENGTH_SHORT).show();
+                    binding.textInputEditTextShareFragmentInput.setText("");
+
+                    CustomFragmentManager.changeFragment((AppCompatActivity) requireActivity(), activityMainBinding, fragmentTextPosts, false);
+                } else {
+                    Toast.makeText(getContext(), "Failed to share", Toast.LENGTH_SHORT).show();
+                }
+
+                progressDialog.dismiss();
+            }
+        });
     }
 }

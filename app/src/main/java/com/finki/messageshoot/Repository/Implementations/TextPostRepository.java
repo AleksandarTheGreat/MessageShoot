@@ -14,6 +14,7 @@ import com.finki.messageshoot.Model.Comment;
 import com.finki.messageshoot.Model.TextPost;
 import com.finki.messageshoot.R;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyAdded;
+import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyDeleted;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostsLoaded;
 import com.finki.messageshoot.Repository.ITextPostRepository;
 import com.finki.messageshoot.View.Adapters.TextPostAdapter;
@@ -94,11 +95,6 @@ public class TextPostRepository implements ITextPostRepository {
     @Override
     public void add(String email, String nickname, String url, String content, OnTextPostSuccessfullyAdded onTextPostSuccessfullyAdded) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ProgressDialog progressDialog = new ProgressDialog(context, R.style.CustomProgressDialogTheme);
-            progressDialog.setTitle("Adding...");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-
             long id = System.currentTimeMillis();
             LocalDateTime localDateTime = LocalDateTime.now();
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.HH.mm.ss");
@@ -125,7 +121,6 @@ public class TextPostRepository implements ITextPostRepository {
                                         @Override
                                         public void onSuccess(Void unused) {
                                             Log.d("Tag", "Successfully added list");
-                                            progressDialog.dismiss();
                                             onTextPostSuccessfullyAdded.onAdded(true);
                                         }
                                     })
@@ -133,7 +128,6 @@ public class TextPostRepository implements ITextPostRepository {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             Log.d("Tag", e.getLocalizedMessage());
-                                            progressDialog.dismiss();
                                             onTextPostSuccessfullyAdded.onAdded(false);
                                         }
                                     });
@@ -143,7 +137,6 @@ public class TextPostRepository implements ITextPostRepository {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.d("Tag", e.getLocalizedMessage());
-                            progressDialog.dismiss();
                             onTextPostSuccessfullyAdded.onAdded(false);
                         }
                     });
@@ -151,12 +144,7 @@ public class TextPostRepository implements ITextPostRepository {
     }
 
     @Override
-    public void delete(TextPost textPost) {
-        ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setTitle("Deleting...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-
+    public void delete(TextPost textPost, OnTextPostSuccessfullyDeleted onTextPostSuccessfullyDeleted) {
         String path = textPost.endpointPath();
 
         DatabaseReference databaseReference = firebaseDatabase.getReference(path);
@@ -165,14 +153,14 @@ public class TextPostRepository implements ITextPostRepository {
                     @Override
                     public void onSuccess(Void unused) {
                         Log.d("Tag", "Successfully deleted post with id" + textPost.getId());
-                        progressDialog.dismiss();
+                        onTextPostSuccessfullyDeleted.onDeleted(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d("Tag", e.getLocalizedMessage());
-                        progressDialog.dismiss();
+                        onTextPostSuccessfullyDeleted.onDeleted(false);
                     }
                 });
     }

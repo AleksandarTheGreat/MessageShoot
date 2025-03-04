@@ -8,13 +8,45 @@
     android:orientation="vertical"
     tools:context=".View.Activities.MainActivity">
 
+    <LinearLayout
+        android:id="@+id/linearLayoutInternet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="6dp"
+        android:visibility="visible"
+        >
+
+        <ImageView
+            android:id="@+id/imageViewInternet"
+            android:layout_height="24dp"
+            android:layout_width="24dp"
+            android:layout_marginHorizontal="4dp"
+            android:src="@mipmap/ic_launcher"
+            />
+
+        <TextView
+            android:id="@+id/textViewInternet"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginHorizontal="4dp"
+            android:text="Status"
+            android:textAlignment="center"
+            />
+
+    </LinearLayout>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerViewMainActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/constraintLayoutMenu"
+        android:layout_below="@id/linearLayoutInternet"
         />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">

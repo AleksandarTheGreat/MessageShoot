@@ -6,6 +6,11 @@
     <color name="transparent">#00123456</color>
     <color name="black_transparent">#44000000</color>
 
+    <color name="black_60">#99000000</color>
+    <color name="green">#aaffaa</color>
+    <color name="red">#ffaaaa</color>
+    <color name="gray">#7A7A7A</color>
+
     <color name="md_theme_primary">#AAC7FF</color>
     <color name="md_theme_onPrimary">#0A305F</color>
     <color name="md_theme_primaryContainer">#274777</color>

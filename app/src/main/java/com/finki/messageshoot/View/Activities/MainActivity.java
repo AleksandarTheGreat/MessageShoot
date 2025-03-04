@@ -2,9 +2,13 @@ package com.finki.messageshoot.View.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.finki.messageshoot.Model.User;
 import com.finki.messageshoot.R;
+import com.finki.messageshoot.Repository.Utils.NetworkUtils;
 import com.finki.messageshoot.View.Fragments.CustomFragmentManager;
 import com.finki.messageshoot.View.Fragments.FragmentHome;
 import com.finki.messageshoot.View.Fragments.FragmentInput;
@@ -129,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
         binding.floatingActionButtonMainActivity.setOnClickListener(view -> {
             CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentInput, false);
         });
+
+        // This seems to be called even when registering
+        NetworkUtils.getInstance().registerCallback(context, binding);
     }
 
     @Override

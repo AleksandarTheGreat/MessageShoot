@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.finki.messageshoot.Model.TextPost;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyAdded;
+import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyDeleted;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostsLoaded;
 import com.finki.messageshoot.Repository.Implementations.TextPostRepository;
 
@@ -35,8 +36,8 @@ public class ViewModelTextPost extends ViewModel {
         this.textPostRepository.add(email, nickname, url, content, onTextPostSuccessfullyAdded);
     }
 
-    public void delete(TextPost textPost){
-        this.textPostRepository.delete(textPost);
+    public void delete(TextPost textPost, OnTextPostSuccessfullyDeleted onTextPostSuccessfullyDeleted){
+        this.textPostRepository.delete(textPost, onTextPostSuccessfullyDeleted);
     }
 
 
