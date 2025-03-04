@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.finki.messageshoot.Model.Comment;
 import com.finki.messageshoot.Model.TextPost;
 import com.finki.messageshoot.R;
 import com.finki.messageshoot.ViewModel.ViewModelTextPost;
@@ -227,6 +228,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             // To update the changes at the db endpoint but not locally.
             // Since the listener will update them locally at every device.
 
+            // Maybe fetch the list of likes before updating??
             List<String> newLikedList = new ArrayList<>(textPost.getLikesList());
 
             if (!textPost.getLikesList().contains(currentEmail)) {

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.finki.messageshoot.Model.Comment;
 import com.finki.messageshoot.Model.TextPost;
+import com.finki.messageshoot.R;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyAdded;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostsLoaded;
 import com.finki.messageshoot.Repository.ITextPostRepository;
@@ -93,7 +94,7 @@ public class TextPostRepository implements ITextPostRepository {
     @Override
     public void add(String email, String nickname, String url, String content, OnTextPostSuccessfullyAdded onTextPostSuccessfullyAdded) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ProgressDialog progressDialog = new ProgressDialog(context);
+            ProgressDialog progressDialog = new ProgressDialog(context, R.style.CustomProgressDialogTheme);
             progressDialog.setTitle("Adding...");
             progressDialog.setCancelable(false);
             progressDialog.show();
