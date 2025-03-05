@@ -72,11 +72,23 @@ public class TextPostRepository implements ITextPostRepository {
                         String postedAtString = ds.child("postedAtString").getValue(String.class);
 
                         List<String> listLikes = new ArrayList<>();
-                        for (DataSnapshot childLikes: ds.child("/listLikes").getChildren()){
-                            listLikes.add(childLikes.getValue(String.class));
+                        for (DataSnapshot likesSnapshot: ds.child("/listLikes").getChildren()){
+                            listLikes.add(likesSnapshot.getValue(String.class));
                         }
 
-                        TextPost textPost = new TextPost(id, email, nickname, profilePicUrl, content, postedAtString, listLikes);
+                        List<Comment> commentList = new ArrayList<>();
+                        for (DataSnapshot commentSnapshot: ds.child("/commentList").getChildren()){
+                            long commentId = commentSnapshot.child("id").getValue(Long.class);
+                            String comment_email = commentSnapshot.child("email").getValue(String.class);
+                            String comment_content = commentSnapshot.child("content").getValue(String.class);
+                            String comment_profile_picture = commentSnapshot.child("profilePicUrl").getValue(String.class);
+                            String comment_posted_at = commentSnapshot.child("postedAt").getValue(String.class);
+
+                            Comment comment = Comment.createCommentForSaving(commentId, comment_email, comment_content, comment_profile_picture, comment_posted_at);
+                            commentList.add(comment);
+                        }
+
+                        TextPost textPost = new TextPost(id, email, nickname, profilePicUrl, content, postedAtString, listLikes, commentList);
                         textPostList.add(textPost);
                     }
                 }

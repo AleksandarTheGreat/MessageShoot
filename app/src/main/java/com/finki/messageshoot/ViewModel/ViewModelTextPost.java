@@ -11,6 +11,7 @@ import com.finki.messageshoot.Model.TextPost;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyAdded;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyDeleted;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostsLoaded;
+import com.finki.messageshoot.Repository.ITextPostRepository;
 import com.finki.messageshoot.Repository.Implementations.TextPostRepository;
 
 import java.time.LocalDateTime;

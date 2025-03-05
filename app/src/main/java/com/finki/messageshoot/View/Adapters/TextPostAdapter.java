@@ -4,12 +4,16 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,11 +25,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.finki.messageshoot.Model.Comment;
 import com.finki.messageshoot.Model.TextPost;
+import com.finki.messageshoot.Model.User;
 import com.finki.messageshoot.R;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyDeleted;
 import com.finki.messageshoot.ViewModel.ViewModelTextPost;
+import com.finki.messageshoot.ViewModel.ViewModelUsers;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.dialog.MaterialDialogs;
@@ -39,8 +46,11 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import kotlin.jvm.internal.Lambda;
@@ -52,15 +62,19 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
     private FirebaseDatabase firebaseDatabase;
     private List<TextPost> textPostList;
     private ViewModelTextPost viewModelTextPost;
+    private ViewModelUsers viewModelUsers;
+    private User currentUser;
     private String currentEmail;
     private TextPostAdapter currentAdapter;
     private Handler handler;
     private static final String FIREBASE_DATABASE_URL = "https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app/";
 
-    public TextPostAdapter(Context context, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost) {
+    public TextPostAdapter(Context context, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost, ViewModelUsers viewModelUsers) {
         this.context = context;
         this.textPostList = textPostList;
         this.viewModelTextPost = viewModelTextPost;
+        this.viewModelUsers = viewModelUsers;
+        this.currentUser = viewModelUsers.getMutableLiveDataCurrentUser().getValue();
 
         this.firebaseAuth = FirebaseAuth.getInstance();
         this.firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_DATABASE_URL);
@@ -101,7 +115,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         super.onViewRecycled(holder);
 
         int position = holder.getAdapterPosition();
-        if (position != -1){
+        if (position != -1) {
             TextPost textPost = textPostList.get(position);
             holder.removeValueEventListener(firebaseDatabase, textPost);
         }
@@ -173,7 +187,19 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                         listLikes.add(likesChild.getValue(String.class));
                     }
 
-                    TextPost tp = new TextPost(id, email, nickname, profilePicture, content, postedAt, listLikes);
+                    List<Comment> commentList = new ArrayList<>();
+                    for (DataSnapshot commentSnapshot : snapshot.child("/commentList").getChildren()) {
+                        long commentId = commentSnapshot.child("id").getValue(Long.class);
+                        String comment_email = commentSnapshot.child("email").getValue(String.class);
+                        String comment_content = commentSnapshot.child("content").getValue(String.class);
+                        String comment_profile_picture = commentSnapshot.child("profilePicUrl").getValue(String.class);
+                        String comment_posted_at = commentSnapshot.child("postedAt").getValue(String.class);
+
+                        Comment comment = Comment.createCommentForSaving(commentId, comment_email, comment_content, comment_profile_picture, comment_posted_at);
+                        commentList.add(comment);
+                    }
+
+                    TextPost tp = new TextPost(id, email, nickname, profilePicture, content, postedAt, listLikes, commentList);
                     TextPost currentTp = textPostList.get(position);
 
                     if (!tp.equals(currentTp)) {
@@ -208,12 +234,14 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void setUpTheUiViewHolder(MyViewHolder holder, TextPost textPost) {
         holder.textViewEmail.setText(textPost.getEmail());
         holder.textViewNickname.setText(textPost.getNickname());
         holder.textViewContent.setText(textPost.getContent());
         holder.textViewPostedAt.setText(textPost.goodLookingDateTimeFormat());
         holder.textViewLikes.setText(textPost.likesCount() + " likes");
+        holder.textViewComments.setText(textPost.commentsCount() + " comments");
 
         Glide.with(context)
                 .load(textPost.getProfilePicUrl())
@@ -257,7 +285,36 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         });
 
         holder.imageViewComments.setOnClickListener(view -> {
-            
+            View bottomDialogView = LayoutInflater.from(context).inflate(R.layout.comments_layout, null);
+
+            BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
+            bottomSheetDialog.setContentView(bottomDialogView);
+            bottomSheetDialog.setCancelable(true);
+
+            ImageView imageViewBack = bottomDialogView.findViewById(R.id.imageViewBackBottomDialog);
+            imageViewBack.setOnClickListener(v -> {
+                bottomSheetDialog.dismiss();
+            });
+
+            ImageView imageViewProfile = bottomDialogView.findViewById(R.id.imageViewProfileBottomDialog);
+            Glide.with(context)
+                    .load(currentUser.getProfilePictureUrl())
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .into(imageViewProfile);
+
+            EditText editText = bottomDialogView.findViewById(R.id.editTextAddCommentBottomDialog);
+
+            @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+            Button buttonPost = bottomDialogView.findViewById(R.id.buttonPostBottomDialog);
+            buttonPost.setOnClickListener(v -> {
+                String text = editText.getText().toString().trim();
+                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+
+                addAComment(text, textPost, bottomSheetDialog);
+            });
+
+            bottomSheetDialog.show();
         });
 
         holder.imageViewDelete.setOnClickListener(view -> {
@@ -275,8 +332,10 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                         viewModelTextPost.delete(textPost, new OnTextPostSuccessfullyDeleted() {
                             @Override
                             public void onDeleted(boolean success) {
-                                if (success) Toast.makeText(context, "Successfully deleted textPost", Toast.LENGTH_SHORT).show();
-                                else Toast.makeText(context, "Failed to delete textPost", Toast.LENGTH_SHORT).show();
+                                if (success)
+                                    Toast.makeText(context, "Successfully deleted textPost", Toast.LENGTH_SHORT).show();
+                                else
+                                    Toast.makeText(context, "Failed to delete textPost", Toast.LENGTH_SHORT).show();
 
                                 progressDialog.dismiss();
                             }
@@ -285,6 +344,52 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     .setNegativeButton("Cancel", ((dialog, which) -> dialog.dismiss()))
                     .setCancelable(true)
                     .show();
+        });
+    }
+
+    private void addAComment(String text, TextPost textPost, BottomSheetDialog bottomSheetDialog) {
+        String path = textPost.endpointPath() + "/commentList";
+        DatabaseReference databaseReference = firebaseDatabase.getReference(path);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    long id = System.currentTimeMillis();
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.HH.mm.ss");
+                    String postedAt = LocalDateTime.now().format(dateTimeFormatter);
+
+                    Comment comment = Comment.createCommentForSaving(id, currentEmail, text, currentUser.getProfilePictureUrl(), postedAt);
+                    List<Comment> commentList = new ArrayList<>(textPost.getCommentsList());
+
+                    commentList.add(comment);
+                    databaseReference.setValue(commentList)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    bottomSheetDialog.dismiss();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(context, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                                    bottomSheetDialog.dismiss();
+                                }
+                            });
+
+                    if (snapshot.exists()) {
+                        Log.d("Tag", "Comment list for textPost " + textPost.getId() + " exists");
+                    } else {
+                        Log.d("Tag", "Comment list for textPost " + textPost.getId() + " does NOT exist");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("Tag", error.getMessage());
+            }
         });
     }
 }

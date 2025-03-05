@@ -19,10 +19,10 @@ public class TextPost {
     private LocalDateTime postedAt;
     private String postedAtString;
     private List<String> likesList;
-    private List<Comment> commentsList;
+    private List<Comment> commentList;
 
 
-    public TextPost(long id, String email, String nickname, String profilePicUrl, String content, String postedAtString, List<String> likesList) {
+    public TextPost(long id, String email, String nickname, String profilePicUrl, String content, String postedAtString, List<String> likesList, List<Comment> commentList) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
@@ -31,6 +31,7 @@ public class TextPost {
         this.postedAtString = postedAtString;
         this.postedAt = parseDateTime(postedAtString);
         this.likesList = likesList;
+        this.commentList = commentList;
     }
 
     private TextPost() {
@@ -45,7 +46,8 @@ public class TextPost {
             return false;
         return id == ((TextPost) obj).id && email.equals(((TextPost) obj).email) && nickname.equals(((TextPost) obj).nickname)
                 && profilePicUrl.equals(((TextPost) obj).profilePicUrl) && content.equals(((TextPost) obj).content)
-                && postedAtString.equals(((TextPost) obj).postedAtString) && likesList.equals(((TextPost) obj).likesList);
+                && postedAtString.equals(((TextPost) obj).postedAtString) && likesList.equals(((TextPost) obj).likesList)
+                && commentList.equals(((TextPost) obj).commentList);
     }
 
     public String endpointPath(){
@@ -92,6 +94,10 @@ public class TextPost {
 
     public int likesCount(){
         return likesList.size();
+    }
+
+    public int commentsCount(){
+        return commentList.size();
     }
 
     public String getEmail() {
@@ -151,11 +157,11 @@ public class TextPost {
     }
 
     public List<Comment> getCommentsList() {
-        return commentsList;
+        return commentList;
     }
 
-    public void setCommentsList(List<Comment> commentsList) {
-        this.commentsList = commentsList;
+    public void setCommentsList(List<Comment> commentList) {
+        this.commentList = commentList;
     }
 
     public String getPostedAtString() {

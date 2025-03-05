@@ -70,4 +70,8 @@
         <item name="android:windowMinWidthMajor">80%</item>
     </style>
 
+    <style name="CustomBottomDialog" parent="Theme.Material3.Dark.BottomSheetDialog">
+        <item name="android:scaleHeight">70%</item>
+    </style>
+
 </resources>

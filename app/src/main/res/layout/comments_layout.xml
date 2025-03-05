@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_height="?actionBarSize"
+        android:layout_width="match_parent"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/imageViewBackBottomDialog"
+            android:layout_height="30dp"
+            android:layout_width="30dp"
+            android:src="@drawable/ic_back"
+            android:layout_centerVertical="true"
+            />
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Comments"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/imageViewBackBottomDialog"
+            />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_height="400dp"
+        android:layout_width="match_parent">
+
+        <LinearLayout
+            android:id="@+id/linearLayoutComments"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            />
+
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_height="100dp"
+        android:layout_width="match_parent"
+        android:paddingHorizontal="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="25dp">
+
+            <ImageView
+                android:id="@+id/imageViewProfileBottomDialog"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/ic_launcher"
+                />
+
+        </androidx.cardview.widget.CardView>
+
+        <EditText
+            android:id="@+id/editTextAddCommentBottomDialog"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:hint="Add a comment"
+            android:textSize="14sp"
+            android:layout_marginHorizontal="8dp"
+            />
+
+        <Button
+            android:id="@+id/buttonPostBottomDialog"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_weight="0"
+            android:text="Post"
+            style="@style/Widget.Material3.Button.TextButton"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
