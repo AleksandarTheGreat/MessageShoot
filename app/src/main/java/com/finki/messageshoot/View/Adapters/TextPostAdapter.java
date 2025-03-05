@@ -257,7 +257,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         });
 
         holder.imageViewComments.setOnClickListener(view -> {
-
+            
         });
 
         holder.imageViewDelete.setOnClickListener(view -> {
