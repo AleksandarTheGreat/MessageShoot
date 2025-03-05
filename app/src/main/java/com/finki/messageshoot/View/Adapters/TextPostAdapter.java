@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.finki.messageshoot.Model.Comment;
 import com.finki.messageshoot.Model.TextPost;
 import com.finki.messageshoot.R;
@@ -25,6 +26,7 @@ import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyDeleted
 import com.finki.messageshoot.ViewModel.ViewModelTextPost;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.dialog.MaterialDialogs;
 import com.google.firebase.auth.FirebaseAuth;
@@ -116,6 +118,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         protected TextView textViewLikes;
         protected TextView textViewComments;
         protected ImageView imageViewLikes;
+        protected ImageView imageViewComments;
         protected ValueEventListener valueEventListener;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -130,6 +133,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             this.textViewLikes = itemView.findViewById(R.id.textViewLikesTextPost);
             this.textViewComments = itemView.findViewById(R.id.textViewCommentsTextPost);
             this.imageViewLikes = itemView.findViewById(R.id.imageViewLikeTextPost);
+            this.imageViewComments = itemView.findViewById(R.id.imageViewCommentTextPost);
         }
 
         public void createValueEventListener(FirebaseDatabase firebaseDatabase,
@@ -210,7 +214,12 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         holder.textViewContent.setText(textPost.getContent());
         holder.textViewPostedAt.setText(textPost.goodLookingDateTimeFormat());
         holder.textViewLikes.setText(textPost.likesCount() + " likes");
-        Picasso.get().load(textPost.getProfilePicUrl()).into(holder.imageViewProfilePic);
+
+        Glide.with(context)
+                .load(textPost.getProfilePicUrl())
+                .placeholder(R.drawable.ic_profile)
+                .error(R.drawable.ic_profile)
+                .into(holder.imageViewProfilePic);
 
         if (textPost.getEmail().equals(currentEmail))
             holder.imageViewDelete.setVisibility(View.VISIBLE);
@@ -245,6 +254,10 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
 
             DatabaseReference databaseReference = firebaseDatabase.getReference(pathToLikes);
             databaseReference.setValue(newLikedList);
+        });
+
+        holder.imageViewComments.setOnClickListener(view -> {
+
         });
 
         holder.imageViewDelete.setOnClickListener(view -> {

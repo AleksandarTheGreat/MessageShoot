@@ -1,4 +1,4 @@
-package com.finki.messageshoot.Model.Helper;
+package com.finki.messageshoot.Repository.Utils;
 
 import android.content.Context;
 import android.content.res.Configuration;

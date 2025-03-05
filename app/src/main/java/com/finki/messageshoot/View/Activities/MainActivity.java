@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
             CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentInput, false);
         });
 
-        // This seems to be called even when registering
+        // This seems to be called even when instantiating
         NetworkUtils.getInstance().registerCallback(context, binding);
     }
 

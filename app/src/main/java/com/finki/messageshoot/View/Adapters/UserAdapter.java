@@ -13,11 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.finki.messageshoot.Model.Helper.ThemeUtils;
+import com.bumptech.glide.Glide;
+import com.finki.messageshoot.Repository.Utils.ThemeUtils;
 import com.finki.messageshoot.Model.User;
 import com.finki.messageshoot.R;
 import com.finki.messageshoot.databinding.ActivityMainBinding;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -61,12 +61,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyViewHolder> 
         holder.textViewEmail.setText(user.getEmail());
         holder.textViewNickname.setText(user.getNickname());
         holder.textViewBio.setText(user.getBio());
-        if (!user.getProfilePictureUrl().isEmpty())
-            Picasso.get()
-                    .load(user.getProfilePictureUrl())
-                    .into(holder.imageViewProfilePicture);
-        else
-            holder.imageViewProfilePicture.setImageResource(R.drawable.ic_profile);
+
+        Glide.with(context)
+                .load(user.getProfilePictureUrl())
+                .placeholder(R.drawable.ic_profile)
+                .into(holder.imageViewProfilePicture);
 
     }
 
