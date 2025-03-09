@@ -55,8 +55,19 @@ public class Comment {
         return id == ((Comment) obj).id;
     }
 
+    @SuppressLint("NewApi")
     private LocalDateTime transformToDateTime(String postedAt){
-        return null;
+        String [] parts = postedAt.split("/.");
+
+        int day = Integer.parseInt(parts[0]);
+        int month = Integer.parseInt(parts[1]);
+        int year = Integer.parseInt(parts[2]);
+
+        int hour = Integer.parseInt(parts[3]);
+        int minute = Integer.parseInt(parts[4]);
+        int seconds = Integer.parseInt(parts[5]);
+
+        return LocalDateTime.of(year, month, day, hour, minute, seconds);
     }
 
     public long getId() {

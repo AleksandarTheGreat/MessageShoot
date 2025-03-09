@@ -84,7 +84,7 @@ public class TextPostRepository implements ITextPostRepository {
                             String comment_profile_picture = commentSnapshot.child("profilePicUrl").getValue(String.class);
                             String comment_posted_at = commentSnapshot.child("postedAt").getValue(String.class);
 
-                            Comment comment = Comment.createCommentForSaving(commentId, comment_email, comment_content, comment_profile_picture, comment_posted_at);
+                            Comment comment = new Comment(commentId, comment_email, comment_content, comment_profile_picture, comment_posted_at);
                             commentList.add(comment);
                         }
 

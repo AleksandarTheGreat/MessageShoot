@@ -5,10 +5,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -314,6 +318,12 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                 addAComment(text, textPost, bottomSheetDialog);
             });
 
+            // Build the comments here
+            // On a separate thread would be nice
+            Log.d("Tag", "ALl comments: ");
+            Log.d("Tag", textPost.getCommentsList().toString());
+            buildAllCommentsForAPost(textPost, bottomDialogView);
+
             bottomSheetDialog.show();
         });
 
@@ -392,5 +402,93 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             }
         });
     }
+
+    private void buildAllCommentsForAPost(TextPost textPost, View bottomDialogView){
+        new Thread(() -> {
+            List<Comment> commentList = textPost.getCommentsList();
+            for (Comment comment: commentList){
+
+                LinearLayout.LayoutParams layoutParamsMain = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParamsMain.setMargins(32, 0, 32, 48);
+
+                LinearLayout linearLayoutMain = new LinearLayout(context);
+                linearLayoutMain.setLayoutParams(layoutParamsMain);
+                linearLayoutMain.setOrientation(LinearLayout.HORIZONTAL);
+                linearLayoutMain.setGravity(Gravity.CENTER_VERTICAL);
+
+
+
+                LinearLayout.LayoutParams layoutParamsCardView = new LinearLayout.LayoutParams(80,80);
+                layoutParamsCardView.setMargins(0,0,0,0);
+
+                CardView cardView = new CardView(context);
+                cardView.setLayoutParams(layoutParamsCardView);
+                cardView.setRadius(50);
+
+
+                LinearLayout.LayoutParams layoutParamsImageView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                layoutParamsImageView.setMargins(0,0,0,0);
+
+                ImageView imageView = new ImageView(context);
+                imageView.setLayoutParams(layoutParamsImageView);
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+
+                LinearLayout.LayoutParams layoutParamsSecond = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParamsSecond.setMargins(32, 0, 32, 0);
+
+                LinearLayout linearLayoutSecond = new LinearLayout(context);
+                linearLayoutSecond.setLayoutParams(layoutParamsSecond);
+                linearLayoutSecond.setOrientation(LinearLayout.VERTICAL);
+
+
+                LinearLayout.LayoutParams layoutParamsTextViewEmail = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParamsTextViewEmail.setMargins(0,0,0,0);
+
+                TextView textViewEmail = new TextView(context);
+                textViewEmail.setLayoutParams(layoutParamsTextViewEmail);
+                textViewEmail.setText(comment.getEmail());
+                textViewEmail.setTextColor(ContextCompat.getColor(context, R.color.white));
+                textViewEmail.setTextSize(14);
+                textViewEmail.setTypeface(Typeface.DEFAULT_BOLD);
+
+                LinearLayout.LayoutParams layoutParamsTextViewContent = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParamsTextViewEmail.setMargins(0,0,0,6);
+
+                TextView textViewContent = new TextView(context);
+                textViewContent.setLayoutParams(layoutParamsTextViewContent);
+                textViewContent.setText(comment.getContent());
+                textViewContent.setTextColor(ContextCompat.getColor(context, R.color.white));
+                textViewContent.setTextSize(16);
+
+
+                handler.post(() -> {
+                    Glide.with(context).load(comment.getProfilePicUrl()).into(imageView);
+                    cardView.addView(imageView);
+                    linearLayoutSecond.addView(textViewEmail);
+                    linearLayoutSecond.addView(textViewContent);
+
+                    linearLayoutMain.addView(cardView);
+                    linearLayoutMain.addView(linearLayoutSecond);
+
+                    LinearLayout linearLayoutComments = bottomDialogView.findViewById(R.id.linearLayoutComments);
+                    linearLayoutComments.addView(linearLayoutMain);
+                });
+            }
+        }).start();
+    }
 }
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
