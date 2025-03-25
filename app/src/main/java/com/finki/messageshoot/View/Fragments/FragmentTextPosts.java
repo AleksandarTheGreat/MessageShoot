@@ -98,7 +98,7 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
         viewModelTextPost = new ViewModelProvider(requireActivity()).get(ViewModelTextPost.class);
         viewModelTextPost.listAll();
 
-        viewModelTextPost.getMutableLiveData().observe(requireActivity(), new Observer<List<TextPost>>() {
+        viewModelTextPost.getMutableLiveData().observe(getViewLifecycleOwner(), new Observer<List<TextPost>>() {
             @Override
             public void onChanged(List<TextPost> textPosts) {
                 List<TextPost> sortedTextPosts = textPosts.stream()

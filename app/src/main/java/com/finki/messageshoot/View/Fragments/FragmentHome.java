@@ -87,16 +87,13 @@ public class FragmentHome extends Fragment implements IEssentials {
 
     @Override
     public void instantiateObjects() {
-        isNightModeOn = ThemeUtils.isNightModeOn(getContext());
-
         viewModelUsers = new ViewModelProvider(requireActivity()).get(ViewModelUsers.class);
-
         firebaseAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public void addEventListeners() {
-        viewModelUsers.getMutableLiveDataCurrentUser().observe(requireActivity(), new Observer<User>() {
+        viewModelUsers.getMutableLiveDataCurrentUser().observe(getViewLifecycleOwner(), new Observer<User>() {
             @Override
             public void onChanged(User user) {
                 if (user.getProfilePictureUrl() == null || user.getProfilePictureUrl().isEmpty())
@@ -108,7 +105,7 @@ public class FragmentHome extends Fragment implements IEssentials {
             }
         });
 
-        viewModelUsers.getMutableLiveDataUsers().observe(requireActivity(), new Observer<List<User>>() {
+        viewModelUsers.getMutableLiveDataUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
                 customAdapter = new UserAdapter(getContext(), activityMainBinding, (AppCompatActivity) getActivity(), users);
@@ -118,7 +115,7 @@ public class FragmentHome extends Fragment implements IEssentials {
                 binding.recyclerViewFragmentHome.setAdapter(customAdapter);
 
                 binding.swipeRefreshLayout.setRefreshing(false);
-                Toast.makeText(getContext(), "New recycler view am I right ?", Toast.LENGTH_SHORT).show();
+                Log.d("Tag", "Why is this stacked??");
             }
         });
 

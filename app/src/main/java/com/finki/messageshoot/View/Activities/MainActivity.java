@@ -126,13 +126,11 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
                     CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentHome, false);
                 } else if (item.getItemId() == R.id.menuItemPosts){
                     CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentTextPosts, false);
+                } else if (item.getItemId() == R.id.menuItemInput){
+                    CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentInput, false);
                 }
                 return true;
             }
-        });
-
-        binding.floatingActionButtonMainActivity.setOnClickListener(view -> {
-            CustomFragmentManager.changeFragment(appCompatActivity, binding, fragmentInput, false);
         });
 
         // This seems to be called even when instantiating

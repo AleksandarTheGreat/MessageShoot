@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.finki.messageshoot.Model.User;
 import com.finki.messageshoot.R;
 import com.finki.messageshoot.Repository.Callbacks.OnTextPostSuccessfullyAdded;
@@ -75,12 +76,14 @@ public class FragmentInput extends Fragment implements IEssentials {
         viewModelTextPost = new ViewModelProvider(requireActivity()).get(ViewModelTextPost.class);
 
         viewModelUsers = new ViewModelProvider(requireActivity()).get(ViewModelUsers.class);
-        viewModelUsers.getMutableLiveDataCurrentUser().observe(requireActivity(), new Observer<User>() {
+        viewModelUsers.getMutableLiveDataCurrentUser().observe(getViewLifecycleOwner(), new Observer<User>() {
             @Override
             public void onChanged(User user) {
                 if (user.getProfilePictureUrl() == null || user.getProfilePictureUrl().isEmpty())
                     binding.imageViewProfileFragmentInput.setImageResource(R.drawable.ic_profile);
-                else Picasso.get().load(user.getProfilePictureUrl()).into(binding.imageViewProfileFragmentInput);
+                else Glide.with(getContext())
+                        .load(user.getProfilePictureUrl())
+                        .into(binding.imageViewProfileFragmentInput);
 
                 binding.textViewEmailFragmentInput.setText(user.getEmail());
                 binding.textViewNicknameFragmentInput.setText(user.getNickname());
@@ -104,7 +107,7 @@ public class FragmentInput extends Fragment implements IEssentials {
 
     }
 
-    public void setActivityMainBinding(ActivityMainBinding activityMainBinding){
+    public void setActivityMainBinding(ActivityMainBinding activityMainBinding) {
         this.activityMainBinding = activityMainBinding;
     }
 
@@ -112,16 +115,16 @@ public class FragmentInput extends Fragment implements IEssentials {
         this.fragmentTextPosts = fragmentTextPosts;
     }
 
-    private void addNewTextPost(){
+    private void addNewTextPost() {
         String content = binding.textInputEditTextShareFragmentInput.getText().toString().trim();
-        if (content.isEmpty()){
+        if (content.isEmpty()) {
             binding.textInputLayoutFragmentInput.setError("Please enter something");
             return;
         }
 
         binding.textInputLayoutFragmentInput.setError("");
         User user = viewModelUsers.getMutableLiveDataCurrentUser().getValue();
-        if (user == null){
+        if (user == null) {
             Toast.makeText(getContext(), "Somehow user is null??", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -134,7 +137,7 @@ public class FragmentInput extends Fragment implements IEssentials {
         viewModelTextPost.add(user.getEmail(), user.getNickname(), user.getProfilePictureUrl(), content, new OnTextPostSuccessfullyAdded() {
             @Override
             public void onAdded(boolean success) {
-                if (success){
+                if (success) {
                     Toast.makeText(getContext(), "Shared successfully", Toast.LENGTH_SHORT).show();
                     binding.textInputEditTextShareFragmentInput.setText("");
 
