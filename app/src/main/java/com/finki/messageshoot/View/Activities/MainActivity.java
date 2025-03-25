@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements IEssentials {
 
         viewModelUsers = new ViewModelProvider(this).get(ViewModelUsers.class);
         viewModelUsers.loadAllUsers();
-        viewModelUsers.findCurrentUser();
+        viewModelUsers.loadCurrentUser();
 
         viewModelTextPost = new ViewModelProvider(this).get(ViewModelTextPost.class);
         viewModelTextPost.init(this, this);

@@ -105,7 +105,7 @@ public class FragmentTextPosts extends Fragment implements IEssentials {
                         .sorted(Comparator.comparing(TextPost::getPostedAt).reversed())
                         .collect(Collectors.toList());
 
-                textPostAdapter = new TextPostAdapter(getContext(), sortedTextPosts, viewModelTextPost, viewModelUsers);
+                textPostAdapter = new TextPostAdapter(getContext(), getActivity(), sortedTextPosts, viewModelTextPost, viewModelUsers);
 
                 binding.recyclerViewTextPosts.setLayoutManager(new LinearLayoutManager(getContext()));
                 binding.recyclerViewTextPosts.setHasFixedSize(true);

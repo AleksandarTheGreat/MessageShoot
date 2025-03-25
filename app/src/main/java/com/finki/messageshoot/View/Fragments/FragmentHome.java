@@ -118,6 +118,7 @@ public class FragmentHome extends Fragment implements IEssentials {
                 binding.recyclerViewFragmentHome.setAdapter(customAdapter);
 
                 binding.swipeRefreshLayout.setRefreshing(false);
+                Toast.makeText(getContext(), "New recycler view am I right ?", Toast.LENGTH_SHORT).show();
             }
         });
 

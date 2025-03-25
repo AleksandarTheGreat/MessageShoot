@@ -30,7 +30,7 @@ public class ViewModelUsers extends ViewModel {
         });
     }
 
-    public void findCurrentUser(){
+    public void loadCurrentUser(){
         userRepository.findCurrentUser(new OnCurrentUserLoadedCallback() {
             @Override
             public void onCurrentUserLoaded(User user) {

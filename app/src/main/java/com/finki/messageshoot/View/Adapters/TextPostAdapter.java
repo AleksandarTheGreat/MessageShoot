@@ -1,19 +1,29 @@
 package com.finki.messageshoot.View.Adapters;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.PixelCopy;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,7 +33,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -50,6 +62,11 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -62,6 +79,7 @@ import kotlin.jvm.internal.Lambda;
 public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyViewHolder> {
 
     private Context context;
+    private FragmentActivity fragmentActivity;
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
     private List<TextPost> textPostList;
@@ -73,8 +91,9 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
     private Handler handler;
     private static final String FIREBASE_DATABASE_URL = "https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app/";
 
-    public TextPostAdapter(Context context, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost, ViewModelUsers viewModelUsers) {
+    public TextPostAdapter(Context context, FragmentActivity fragmentActivity, List<TextPost> textPostList, ViewModelTextPost viewModelTextPost, ViewModelUsers viewModelUsers) {
         this.context = context;
+        this.fragmentActivity = fragmentActivity;
         this.textPostList = textPostList;
         this.viewModelTextPost = viewModelTextPost;
         this.viewModelUsers = viewModelUsers;
@@ -137,6 +156,9 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
         protected TextView textViewComments;
         protected ImageView imageViewLikes;
         protected ImageView imageViewComments;
+        protected LinearLayout linearContainerLikes;
+        protected LinearLayout linearContainerComments;
+        protected LinearLayout linearContainerScreenShot;
         protected ValueEventListener valueEventListener;
 
         public MyViewHolder(@NonNull View itemView) {
@@ -152,6 +174,10 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             this.textViewComments = itemView.findViewById(R.id.textViewCommentsTextPost);
             this.imageViewLikes = itemView.findViewById(R.id.imageViewLikeTextPost);
             this.imageViewComments = itemView.findViewById(R.id.imageViewCommentTextPost);
+
+            this.linearContainerLikes = itemView.findViewById(R.id.linearContainerLikes);
+            this.linearContainerComments = itemView.findViewById(R.id.linearContainerComments);
+            this.linearContainerScreenShot = itemView.findViewById(R.id.linearContainerScreenshot);
         }
 
         public void createValueEventListener(FirebaseDatabase firebaseDatabase,
@@ -268,7 +294,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             String pathToLikes = textPost.endpointPath() + "/listLikes/";
 
             // SO I can have changes in the listener, I am not updating the current textPost likes list...
-            // If I do no changes will be done in the listener, that is why I create a whole different new list.
+            // If I do, no changes will be done in the listener, that is why I create a whole different new list.
             // To update the changes at the db endpoint but not locally.
             // Since the listener will update them locally at every device.
 
@@ -288,7 +314,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             databaseReference.setValue(newLikedList);
         });
 
-        holder.imageViewComments.setOnClickListener(view -> {
+        holder.linearContainerComments.setOnClickListener(view -> {
             View bottomDialogView = LayoutInflater.from(context).inflate(R.layout.comments_layout, null);
 
             BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
@@ -325,6 +351,34 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             buildAllCommentsForAPost(textPost, bottomDialogView);
 
             bottomSheetDialog.show();
+        });
+
+        holder.linearContainerScreenShot.setOnClickListener(view -> {
+            String name = System.currentTimeMillis() + ".jpg";
+
+            Window window = fragmentActivity.getWindow();
+            Bitmap bitmap = Bitmap.createBitmap(window.getDecorView().getWidth(),
+                    window.getDecorView().getHeight(),
+                    Bitmap.Config.ARGB_8888);
+
+            Canvas canvas = new Canvas(bitmap);
+            window.getDecorView().draw(canvas);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, name);
+            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
+            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+
+            Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+            try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)){
+                if (outputStream != null){
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100 ,outputStream);
+                    Toast.makeText(context,"Screenshotted", Toast.LENGTH_SHORT).show();
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         holder.imageViewDelete.setOnClickListener(view -> {
@@ -390,7 +444,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     if (snapshot.exists()) {
                         Log.d("Tag", "Comment list for textPost " + textPost.getId() + " exists");
                     } else {
-                        Log.d("Tag", "Comment list for textPost " + textPost.getId() + " does NOT exist");
+                        Log.d("Tag", "Comment list for textPost " + textPost.getId() + " does NOT exist, and it is added");
                     }
                 }
 
