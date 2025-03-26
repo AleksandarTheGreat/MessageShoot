@@ -36,6 +36,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -70,9 +71,11 @@ import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import kotlin.jvm.internal.Lambda;
 
@@ -346,11 +349,18 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                 addAComment(text, textPost, bottomSheetDialog);
             });
 
-            // Build the comments here
-            // On a separate thread would be nice
-            Log.d("Tag", "All comments: ");
-            Log.d("Tag", textPost.getCommentsList().toString());
-            buildAllCommentsForAPost(textPost, bottomDialogView);
+            // Set up the adapter instead of building comments
+            List<Comment> commentList = textPost.getCommentsList()
+                    .stream()
+                    .sorted(Comparator.comparing(Comment::getPostedAtDateTime).reversed())
+                    .collect(Collectors.toList());
+
+            @SuppressLint({"MissingInflatedId", "LocalSuppress"})
+            RecyclerView recyclerView = bottomDialogView.findViewById(R.id.recyclerViewComments);
+            CommentAdapter commentAdapter = new CommentAdapter(context, commentList);
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setAdapter(commentAdapter);
 
             bottomSheetDialog.show();
         });
@@ -372,10 +382,10 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
 
             Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-            try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)){
-                if (outputStream != null){
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100 ,outputStream);
-                    Toast.makeText(context,"Screenshotted", Toast.LENGTH_SHORT).show();
+            try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+                if (outputStream != null) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    Toast.makeText(context, "Screenshotted", Toast.LENGTH_SHORT).show();
                 }
 
             } catch (IOException e) {
@@ -398,8 +408,10 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                         viewModelTextPost.delete(textPost, new OnTextPostSuccessfullyDeleted() {
                             @Override
                             public void onDeleted(boolean success) {
-                                if (success) Toast.makeText(context, "Successfully deleted", Toast.LENGTH_SHORT).show();
-                                else Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show();
+                                if (success)
+                                    Toast.makeText(context, "Successfully deleted", Toast.LENGTH_SHORT).show();
+                                else
+                                    Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show();
 
                                 progressDialog.dismiss();
                             }
@@ -425,6 +437,8 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     Comment comment = Comment.createCommentForSaving(id, currentEmail, text, currentUser.getProfilePictureUrl(), postedAt);
                     List<Comment> commentList = new ArrayList<>(textPost.getCommentsList());
 
+                    // Here lies the problem because this newly created comment is not having the postedAtDateTime parsed
+                    // I've added it 3 minutes after, but still I need to fix the code when changing the paths to one parent
                     commentList.add(comment);
                     databaseReference.setValue(commentList)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -455,81 +469,6 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                 Log.d("Tag", error.getMessage());
             }
         });
-    }
-
-    private void buildAllCommentsForAPost(TextPost textPost, View bottomDialogView){
-        new Thread(() -> {
-            List<Comment> commentList = textPost.getCommentsList();
-            for (Comment comment: commentList){
-
-                LinearLayout.LayoutParams layoutParamsMain = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParamsMain.setMargins(32, 0, 32, 48);
-
-                LinearLayout linearLayoutMain = new LinearLayout(context);
-                linearLayoutMain.setLayoutParams(layoutParamsMain);
-                linearLayoutMain.setOrientation(LinearLayout.HORIZONTAL);
-                linearLayoutMain.setGravity(Gravity.CENTER_VERTICAL);
-
-
-
-                LinearLayout.LayoutParams layoutParamsCardView = new LinearLayout.LayoutParams(80,80);
-                layoutParamsCardView.setMargins(0,0,0,0);
-
-                CardView cardView = new CardView(context);
-                cardView.setLayoutParams(layoutParamsCardView);
-                cardView.setRadius(50);
-
-
-                LinearLayout.LayoutParams layoutParamsImageView = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                layoutParamsImageView.setMargins(0,0,0,0);
-
-                ImageView imageView = new ImageView(context);
-                imageView.setLayoutParams(layoutParamsImageView);
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-
-                LinearLayout.LayoutParams layoutParamsSecond = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParamsSecond.setMargins(32, 0, 32, 0);
-
-                LinearLayout linearLayoutSecond = new LinearLayout(context);
-                linearLayoutSecond.setLayoutParams(layoutParamsSecond);
-                linearLayoutSecond.setOrientation(LinearLayout.VERTICAL);
-
-
-                LinearLayout.LayoutParams layoutParamsTextViewEmail = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParamsTextViewEmail.setMargins(0,0,0,0);
-
-                TextView textViewEmail = new TextView(context);
-                textViewEmail.setLayoutParams(layoutParamsTextViewEmail);
-                textViewEmail.setText(comment.getEmail());
-                textViewEmail.setTextColor(ContextCompat.getColor(context, R.color.white));
-                textViewEmail.setTextSize(14);
-                textViewEmail.setTypeface(Typeface.DEFAULT_BOLD);
-
-                LinearLayout.LayoutParams layoutParamsTextViewContent = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParamsTextViewEmail.setMargins(0,0,0,6);
-
-                TextView textViewContent = new TextView(context);
-                textViewContent.setLayoutParams(layoutParamsTextViewContent);
-                textViewContent.setText(comment.getContent());
-                textViewContent.setTextColor(ContextCompat.getColor(context, R.color.white));
-                textViewContent.setTextSize(16);
-
-
-                handler.post(() -> {
-                    Glide.with(context).load(comment.getProfilePicUrl()).into(imageView);
-                    cardView.addView(imageView);
-                    linearLayoutSecond.addView(textViewEmail);
-                    linearLayoutSecond.addView(textViewContent);
-
-                    linearLayoutMain.addView(cardView);
-                    linearLayoutMain.addView(linearLayoutSecond);
-
-                    LinearLayout linearLayoutComments = bottomDialogView.findViewById(R.id.linearLayoutComments);
-                    linearLayoutComments.addView(linearLayoutMain);
-                });
-            }
-        }).start();
     }
 }
 

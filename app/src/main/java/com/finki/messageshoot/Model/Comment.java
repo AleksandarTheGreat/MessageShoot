@@ -25,6 +25,10 @@ public class Comment {
         this.content = content;
         this.profilePicUrl = profilePicUrl;
         this.postedAt = postedAt;
+
+        // I think I can parse the string into localDate time
+        // and it won't be saved since I create the below comment for saving...
+        this.postedAtDateTime = transformToDateTime(postedAt);
     }
 
     public static Comment createCommentForSaving(long id, String email, String content, String profilePicUrl, String postedAt){
@@ -35,6 +39,7 @@ public class Comment {
         comment.setContent(content);
         comment.setProfilePicUrl(profilePicUrl);
         comment.setPostedAt(postedAt);
+        comment.setPostedAtDateTime(comment.transformToDateTime(postedAt));
 
         return comment;
     }
@@ -57,7 +62,7 @@ public class Comment {
 
     @SuppressLint("NewApi")
     private LocalDateTime transformToDateTime(String postedAt){
-        String [] parts = postedAt.split("/.");
+        String [] parts = postedAt.split("\\.");
 
         int day = Integer.parseInt(parts[0]);
         int month = Integer.parseInt(parts[1]);

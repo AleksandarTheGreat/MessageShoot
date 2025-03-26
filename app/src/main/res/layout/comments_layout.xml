@@ -31,18 +31,10 @@
 
     </RelativeLayout>
 
-    <ScrollView
-        android:layout_height="400dp"
-        android:layout_width="match_parent">
-
-        <LinearLayout
-            android:id="@+id/linearLayoutComments"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            />
-
-    </ScrollView>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewComments"
+        android:layout_width="match_parent"
+        android:layout_height="450dp"/>
 
     <LinearLayout
         android:layout_height="100dp"
