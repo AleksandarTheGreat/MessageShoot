@@ -196,6 +196,8 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     // remove from the adapter list
                     // remove from the UI aka viewHolder
                     if (!snapshot.exists()) {
+
+                        removeValueEventListener(firebaseDatabase, textPost);
                         textPostList.remove(position);
                         textPostAdapter.notifyDataSetChanged();
 
@@ -235,6 +237,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     if (!tp.equals(currentTp)) {
                         textPostList.set(position, tp);
                         handler.post(() -> {
+                            removeValueEventListener(firebaseDatabase, textPost);
                             textPostAdapter.notifyItemChanged(position);
                         });
                         Log.d("Tag", "Changes have happened");
@@ -251,7 +254,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             };
 
             databaseReference.addValueEventListener(valueEventListener);
-            Log.d("Tag", "Listener added");
+            Log.d("Tag", "Listener added -- " + textPost.getId());
         }
 
         public void removeValueEventListener(FirebaseDatabase firebaseDatabase, TextPost textPost) {
@@ -260,7 +263,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             DatabaseReference databaseReference = firebaseDatabase.getReference(path);
             databaseReference.removeEventListener(valueEventListener);
 
-            Log.d("Tag", "Listener removed");
+            Log.d("Tag", "Listener removed -- " + textPost.getId());
         }
     }
 
