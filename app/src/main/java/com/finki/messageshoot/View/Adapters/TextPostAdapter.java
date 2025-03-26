@@ -197,12 +197,10 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     // remove from the UI aka viewHolder
                     if (!snapshot.exists()) {
 
+                        // The removal of the listener has to be before the notify changes
                         removeValueEventListener(firebaseDatabase, textPost);
                         textPostList.remove(position);
                         textPostAdapter.notifyDataSetChanged();
-
-                        // Maybe remove the valueEventListener here somehow,
-                        // when the textPost and view are deleted.
 
                         return;
                     }
@@ -237,6 +235,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     if (!tp.equals(currentTp)) {
                         textPostList.set(position, tp);
                         handler.post(() -> {
+                            // The removal of the listener has to be before the notify changes
                             removeValueEventListener(firebaseDatabase, textPost);
                             textPostAdapter.notifyItemChanged(position);
                         });
