@@ -346,7 +346,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
 
             // Build the comments here
             // On a separate thread would be nice
-            Log.d("Tag", "ALl comments: ");
+            Log.d("Tag", "All comments: ");
             Log.d("Tag", textPost.getCommentsList().toString());
             buildAllCommentsForAPost(textPost, bottomDialogView);
 
@@ -396,10 +396,8 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                         viewModelTextPost.delete(textPost, new OnTextPostSuccessfullyDeleted() {
                             @Override
                             public void onDeleted(boolean success) {
-                                if (success)
-                                    Toast.makeText(context, "Successfully deleted textPost", Toast.LENGTH_SHORT).show();
-                                else
-                                    Toast.makeText(context, "Failed to delete textPost", Toast.LENGTH_SHORT).show();
+                                if (success) Toast.makeText(context, "Successfully deleted", Toast.LENGTH_SHORT).show();
+                                else Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show();
 
                                 progressDialog.dismiss();
                             }
