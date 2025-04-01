@@ -13,33 +13,27 @@ public class Comment {
     private String email;
     private String content;
     private String profilePicUrl;
-    private String postedAt;
     private LocalDateTime postedAtDateTime;
 
     private Comment(){
 
     }
-    public Comment(long id, String email, String content, String profilePicUrl, String postedAt) {
+    public Comment(long id, String email, String content, String profilePicUrl, LocalDateTime postedAtDateTime) {
         this.id = id;
         this.email = email;
         this.content = content;
         this.profilePicUrl = profilePicUrl;
-        this.postedAt = postedAt;
-
-        // I think I can parse the string into localDate time
-        // and it won't be saved since I create the below comment for saving...
-        this.postedAtDateTime = transformToDateTime(postedAt);
+        this.postedAtDateTime = postedAtDateTime;
     }
 
-    public static Comment createCommentForSaving(long id, String email, String content, String profilePicUrl, String postedAt){
+    public static Comment createCommentForSaving(long id, String email, String content, String profilePicUrl, LocalDateTime postedAtDateTime){
         Comment comment = new Comment();
 
         comment.setId(id);
         comment.setEmail(email);
         comment.setContent(content);
         comment.setProfilePicUrl(profilePicUrl);
-        comment.setPostedAt(postedAt);
-        comment.setPostedAtDateTime(comment.transformToDateTime(postedAt));
+        comment.setPostedAtDateTime(postedAtDateTime);
 
         return comment;
     }
@@ -48,7 +42,7 @@ public class Comment {
     @NonNull
     @Override
     public String toString() {
-        return String.format("Comment id: %d\nEmail: %s\nContent: %s\nProfile pic url: %s\nPosted at: %s", id, email, content, profilePicUrl, postedAt);
+        return String.format("Comment id: %d\nEmail: %s\nContent: %s\nProfile pic url: %s\nPosted at: %s", id, email, content, profilePicUrl, postedAtDateTime.toString());
     }
 
     @Override
@@ -58,21 +52,6 @@ public class Comment {
         else if (getClass() != obj.getClass())
             return false;
         return id == ((Comment) obj).id;
-    }
-
-    @SuppressLint("NewApi")
-    private LocalDateTime transformToDateTime(String postedAt){
-        String [] parts = postedAt.split("\\.");
-
-        int day = Integer.parseInt(parts[0]);
-        int month = Integer.parseInt(parts[1]);
-        int year = Integer.parseInt(parts[2]);
-
-        int hour = Integer.parseInt(parts[3]);
-        int minute = Integer.parseInt(parts[4]);
-        int seconds = Integer.parseInt(parts[5]);
-
-        return LocalDateTime.of(year, month, day, hour, minute, seconds);
     }
 
     public long getId() {
@@ -106,15 +85,6 @@ public class Comment {
     public void setProfilePicUrl(String profilePicUrl) {
         this.profilePicUrl = profilePicUrl;
     }
-
-    public String getPostedAt() {
-        return postedAt;
-    }
-
-    public void setPostedAt(String postedAt) {
-        this.postedAt = postedAt;
-    }
-
     public LocalDateTime getPostedAtDateTime() {
         return postedAtDateTime;
     }

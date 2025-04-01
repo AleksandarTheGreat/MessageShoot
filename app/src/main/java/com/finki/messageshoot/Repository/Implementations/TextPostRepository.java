@@ -43,17 +43,22 @@ public class TextPostRepository implements ITextPostRepository {
 
     public TextPostRepository(Context context, FragmentActivity fragmentActivity) {
         this.context = context;
-        this.firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app/");
+        this.firebaseDatabase = FirebaseDatabase.getInstance("https://social101-12725-default-rtdb.europe-west1.firebasedatabase.app");
         this.fragmentActivity = fragmentActivity;
         this.viewModelTextPost = new ViewModelProvider(fragmentActivity).get(ViewModelTextPost.class);
     }
 
     @Override
     public void listAll(OnTextPostsLoaded onTextPostsLoaded) {
-        DatabaseReference databaseReference = firebaseDatabase.getReference();
+        DatabaseReference databaseReference = firebaseDatabase.getReference("/textPosts");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()){
+                    onTextPostsLoaded.onLoaded(new ArrayList<>());
+                    return;
+                }
+
                 List<TextPost> textPostList = new ArrayList<>();
 
                 // All emails
@@ -69,7 +74,19 @@ public class TextPostRepository implements ITextPostRepository {
                         String nickname = ds.child("nickname").getValue(String.class);
                         String profilePicUrl = ds.child("profilePicUrl").getValue(String.class);
                         String content = ds.child("content").getValue(String.class);
-                        String postedAtString = ds.child("postedAtString").getValue(String.class);
+
+                        // read textPost postedAt
+                        int year = ds.child("/postedAt").child("year").getValue(Integer.class);
+                        int month = ds.child("postedAt").child("monthValue").getValue(Integer.class);
+                        int day = ds.child("/postedAt").child("dayOfMonth").getValue(Integer.class);
+                        int hour = ds.child("postedAt").child("hour").getValue(Integer.class);
+                        int minute = ds.child("postedAt").child("minute").getValue(Integer.class);
+                        int second = ds.child("postedAt").child("second").getValue(Integer.class);
+
+                        LocalDateTime postedAt = null;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                             postedAt = LocalDateTime.of(year, month, day, hour, minute, second);
+                        }
 
                         List<String> listLikes = new ArrayList<>();
                         for (DataSnapshot likesSnapshot: ds.child("/listLikes").getChildren()){
@@ -82,13 +99,25 @@ public class TextPostRepository implements ITextPostRepository {
                             String comment_email = commentSnapshot.child("email").getValue(String.class);
                             String comment_content = commentSnapshot.child("content").getValue(String.class);
                             String comment_profile_picture = commentSnapshot.child("profilePicUrl").getValue(String.class);
-                            String comment_posted_at = commentSnapshot.child("postedAt").getValue(String.class);
 
-                            Comment comment = new Comment(commentId, comment_email, comment_content, comment_profile_picture, comment_posted_at);
+                            // read Comment postedAtDateTime
+                            int cYear = commentSnapshot.child("postedAtDateTime").child("year").getValue(Integer.class);
+                            int cMonth = commentSnapshot.child("postedAtDateTime").child("monthValue").getValue(Integer.class);
+                            int cDay = commentSnapshot.child("/postedAtDateTime").child("dayOfMonth").getValue(Integer.class);
+                            int cHour = commentSnapshot.child("postedAtDateTime").child("hour").getValue(Integer.class);
+                            int cMinute = commentSnapshot.child("/postedAtDateTime").child("minute").getValue(Integer.class);
+                            int cSecond = commentSnapshot.child("postedAtDateTime").child("second").getValue(Integer.class);
+
+                            LocalDateTime postedAtDateTime = null;
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                postedAtDateTime = LocalDateTime.of(cYear, cMonth, cDay, cHour, cMinute, cSecond);
+                            }
+
+                            Comment comment = new Comment(commentId, comment_email, comment_content, comment_profile_picture, postedAtDateTime);
                             commentList.add(comment);
                         }
 
-                        TextPost textPost = new TextPost(id, email, nickname, profilePicUrl, content, postedAtString, listLikes, commentList);
+                        TextPost textPost = new TextPost(id, email, nickname, profilePicUrl, content, postedAt, listLikes, commentList);
                         textPostList.add(textPost);
                     }
                 }
@@ -109,12 +138,10 @@ public class TextPostRepository implements ITextPostRepository {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             long id = System.currentTimeMillis();
             LocalDateTime localDateTime = LocalDateTime.now();
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.HH.mm.ss");
-            String postedAtString = localDateTime.format(dateTimeFormatter);
 
-            TextPost textPost = TextPost.createTextPostForSaving(id, email, nickname, url, content, postedAtString);
+            TextPost textPost = TextPost.createTextPostForSaving(id, email, nickname, url, content, localDateTime);
 
-            String path = email + "/" + id;
+            String path = "/textPosts/" + email + "/" + id;
             path = path.replace(".", ":::");
 
             DatabaseReference databaseReference = firebaseDatabase.getReference(path);

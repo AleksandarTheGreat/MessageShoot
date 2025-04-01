@@ -17,20 +17,18 @@ public class TextPost {
     private String profilePicUrl;
     private String content;
     private LocalDateTime postedAt;
-    private String postedAtString;
     private List<String> likesList;
     private List<Comment> commentList;
 
 
-    public TextPost(long id, String email, String nickname, String profilePicUrl, String content, String postedAtString, List<String> likesList, List<Comment> commentList) {
+    public TextPost(long id, String email, String nickname, String profilePicUrl, String content, LocalDateTime postedAt, List<String> likesList, List<Comment> commentList) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
         this.profilePicUrl = profilePicUrl;
         this.content = content;
-        this.postedAtString = postedAtString;
-        this.postedAt = parseDateTime(postedAtString);
         this.likesList = likesList;
+        this.postedAt = postedAt;
         this.commentList = commentList;
     }
 
@@ -46,13 +44,12 @@ public class TextPost {
             return false;
         return id == ((TextPost) obj).id && email.equals(((TextPost) obj).email) && nickname.equals(((TextPost) obj).nickname)
                 && profilePicUrl.equals(((TextPost) obj).profilePicUrl) && content.equals(((TextPost) obj).content)
-                && postedAtString.equals(((TextPost) obj).postedAtString) && likesList.equals(((TextPost) obj).likesList)
-                && commentList.equals(((TextPost) obj).commentList);
+                && likesList.equals(((TextPost) obj).likesList) && commentList.equals(((TextPost) obj).commentList);
     }
 
     public String endpointPath(){
         String replacedEmail = email.replace(".", ":::");
-        return replacedEmail + "/" + id;
+        return "/textPosts/" + replacedEmail + "/" + id;
     }
 
     private LocalDateTime parseDateTime(String postedAtString){
@@ -79,7 +76,7 @@ public class TextPost {
         return this.postedAt.format(dateTimeFormatter);
     }
 
-    public static TextPost createTextPostForSaving(long id, String email, String nickname, String profilePicUrl, String content, String postedAtString){
+    public static TextPost createTextPostForSaving(long id, String email, String nickname, String profilePicUrl, String content, LocalDateTime postedAt){
         TextPost textPost = new TextPost();
 
         textPost.setId(id);
@@ -87,7 +84,7 @@ public class TextPost {
         textPost.setNickname(nickname);
         textPost.setProfilePicUrl(profilePicUrl);
         textPost.setContent(content);
-        textPost.setPostedAtString(postedAtString);
+        textPost.setPostedAt(postedAt);
 
         return textPost;
     }
@@ -162,13 +159,5 @@ public class TextPost {
 
     public void setCommentsList(List<Comment> commentList) {
         this.commentList = commentList;
-    }
-
-    public String getPostedAtString() {
-        return postedAtString;
-    }
-
-    public void setPostedAtString(String postedAtString) {
-        this.postedAtString = postedAtString;
     }
 }

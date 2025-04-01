@@ -43,7 +43,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyViewHo
 
         holder.textViewEmail.setText(comment.getEmail());
         holder.textViewContent.setText(comment.getContent());
-        holder.textViewPostedAt.setText(calculateDaysAgo(comment.getPostedAt()));
+        holder.textViewPostedAt.setText(comment.getPostedAtDateTime().toString());
         Glide.with(context)
                 .load(comment.getProfilePicUrl())
                 .into(holder.imageViewProfilePicture);

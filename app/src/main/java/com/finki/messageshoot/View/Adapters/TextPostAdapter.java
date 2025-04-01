@@ -212,8 +212,20 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                     String content = snapshot.child("content").getValue(String.class);
                     String email = snapshot.child("email").getValue(String.class);
                     String nickname = snapshot.child("nickname").getValue(String.class);
-                    String postedAt = snapshot.child("postedAtString").getValue(String.class);
                     String profilePicture = snapshot.child("profilePicUrl").getValue(String.class);
+
+                    // read textPost postedAt
+                    int year = snapshot.child("postedAt").child("year").getValue(Integer.class);
+                    int month = snapshot.child("/postedAt").child("monthValue").getValue(Integer.class);
+                    int day = snapshot.child("postedAt").child("dayOfMonth").getValue(Integer.class);
+                    int hour = snapshot.child("postedAt").child("hour").getValue(Integer.class);
+                    int minute = snapshot.child("/postedAt").child("minute").getValue(Integer.class);
+                    int second = snapshot.child("/postedAt").child("second").getValue(Integer.class);
+
+                    LocalDateTime postedAt = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        postedAt = LocalDateTime.of(year, month, day, hour, minute, second);
+                    }
 
                     List<String> listLikes = new ArrayList<>();
                     for (DataSnapshot likesChild : snapshot.child("/listLikes").getChildren()) {
@@ -226,11 +238,24 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
                         String comment_email = commentSnapshot.child("email").getValue(String.class);
                         String comment_content = commentSnapshot.child("content").getValue(String.class);
                         String comment_profile_picture = commentSnapshot.child("profilePicUrl").getValue(String.class);
-                        String comment_posted_at = commentSnapshot.child("postedAt").getValue(String.class);
 
-                        Comment comment = Comment.createCommentForSaving(commentId, comment_email, comment_content, comment_profile_picture, comment_posted_at);
+                        // read Comment postedAtDateTime
+                        int cYear = commentSnapshot.child("/postedAtDateTime").child("year").getValue(Integer.class);
+                        int cMonth = commentSnapshot.child("/postedAtDateTime").child("monthValue").getValue(Integer.class);
+                        int cDay = commentSnapshot.child("postedAtDateTime").child("dayOfMonth").getValue(Integer.class);
+                        int cHour = commentSnapshot.child("postedAtDateTime").child("hour").getValue(Integer.class);
+                        int cMinute = commentSnapshot.child("/postedAtDateTime").child("minute").getValue(Integer.class);
+                        int cSecond = commentSnapshot.child("postedAtDateTime").child("second").getValue(Integer.class);
+
+                        LocalDateTime postedAtDateTime = null;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            postedAtDateTime = LocalDateTime.of(cYear, cMonth, cDay, cHour, cMinute, cSecond);
+                        }
+
+                        Comment comment = new Comment(commentId, comment_email, comment_content, comment_profile_picture, postedAtDateTime);
                         commentList.add(comment);
                     }
+
 
                     TextPost tp = new TextPost(id, email, nickname, profilePicture, content, postedAt, listLikes, commentList);
                     TextPost currentTp = textPostList.get(position);
@@ -431,8 +456,7 @@ public class TextPostAdapter extends RecyclerView.Adapter<TextPostAdapter.MyView
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     long id = System.currentTimeMillis();
-                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.HH.mm.ss");
-                    String postedAt = LocalDateTime.now().format(dateTimeFormatter);
+                    LocalDateTime postedAt = LocalDateTime.now();
 
                     Comment comment = Comment.createCommentForSaving(id, currentEmail, text, currentUser.getProfilePictureUrl(), postedAt);
                     List<Comment> commentList = new ArrayList<>(textPost.getCommentsList());
